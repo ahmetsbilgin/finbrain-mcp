@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from ..registry import mcp
 from ..auth import resolve_api_key
 from ..client_adapter import FBClient
