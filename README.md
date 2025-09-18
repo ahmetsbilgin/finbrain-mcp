@@ -10,7 +10,7 @@ Backed by the official **`finbrain-python`** SDK.
 
 -   Package name: **`finbrain-mcp`**
     
--   CLI entrypoints: **`finbrain-mcp`**, **`finbrain-mcp-login`**
+-   CLI entrypoint: **`finbrain-mcp`**
     
 
 ----------
@@ -51,13 +51,19 @@ Backed by the official **`finbrain-python`** SDK.
 ## Install
 
 ### Option A — Isolated install (recommended)
-
 ```
 # macOS/Linux
 pipx install finbrain-mcp
 pipx upgrade finbrain-mcp
 ```
 
+```
+# Windows
+pipx install finbrain-mcp
+pipx upgrade finbrain-mcp
+```
+
+### Option B — Dev install (editable)
 ```
 # from repo root
 python -m venv .venv
@@ -195,9 +201,12 @@ All tools return JSON by default and support paging; many also support CSV via `
 
 ### Availability
 
--   `available_markets() → list[str]`
-    
--   `available_tickers({ "dataset": "predictions" }) → [{"ticker": "...", "name": "...", "market": "..."}]`
+- `available_markets()`  
+  → `["S&P 500", "NASDAQ", ...]`
+
+- `available_tickers({ "dataset": "daily" })`  
+  or `{ "dataset": "monthly" }` (defaults to `"daily"` if omitted)  
+  → `[{"ticker": "AMZN", "name": "Amazon.com, Inc.", "market": "S&P 500"}, ...]`
     
 
 ### Predictions
