@@ -2,7 +2,6 @@ from __future__ import annotations
 from .registry import mcp
 from .auth import resolve_api_key
 from .client_adapter import FBClient
-from . import __version__
 
 
 # Eagerly resolve to fail fast with a good error if misconfigured
