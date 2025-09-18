@@ -7,9 +7,7 @@ from ..client_adapter import FBClient
 
 
 class TickersReq(BaseModel):
-    dataset: str = Field(
-        ..., description="Dataset name, e.g. 'daily', 'predictions', 'options', etc."
-    )
+    dataset: Literal["daily", "monthly"] = "daily"
     format: Literal["json"] = "json"  # only json for this one
 
 

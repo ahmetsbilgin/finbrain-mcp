@@ -33,7 +33,7 @@ class FBClient:
         raw = self.fb.available.markets()
         return normalize_available_markets(raw)
 
-    def available_tickers(self, dataset: str) -> Any:
+    def available_tickers(self, dataset: Literal["daily", "monthly"]) -> Any:
         out = self.fb.available.tickers(dataset, as_dataframe=False)
         return df_to_records_maybe(out)
 
