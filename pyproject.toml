@@ -9,7 +9,7 @@ description     = "Open-source FinBrain MCP server (SDK-first via finbrain-pytho
 readme          = "README.md"
 license         = "MIT"
 authors         = [{name = "Ahmet Salim Bilgin", email="ahmet@finbrain.tech"}]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
   "fastmcp>=2",
   "pydantic>=2",
