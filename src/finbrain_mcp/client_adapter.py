@@ -15,7 +15,7 @@ from .normalizers import (
 )
 
 # SDK import (PyPI package name is finbrain-python; import path is `finbrain`)
-from finbrain import FinBrainClient
+from finbrain import FinBrainClient  # type: ignore[import-untyped]
 
 
 class FBClient:

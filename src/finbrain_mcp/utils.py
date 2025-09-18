@@ -42,7 +42,7 @@ def rows_to_csv(rows: Iterable[Dict]) -> str:
 def df_to_records_maybe(obj: Any) -> list[dict]:
     """If obj is a pandas DataFrame/Series, convert to JSON records; else return as-is."""
     try:
-        import pandas as pd  # optional
+        import pandas as pd  # type: ignore[import-untyped]
 
         if isinstance(obj, pd.DataFrame):
             df = obj.copy()
