@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "finbrain-dev": {
+      "command": "C:\\path\\to\\repo\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "finbrain_mcp.server"],
+      "env": {
+        "FINBRAIN_API_KEY": "YOUR_KEY_HERE"
+      }
+    }
+  }
+}
