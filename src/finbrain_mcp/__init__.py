@@ -1,11 +1,11 @@
-# FinBrain MCP package
-try:
-    # written by setuptools-scm at build time
-    from ._version import __version__  # type: ignore
-except Exception:  # pragma: no cover
-    try:
-        from importlib.metadata import version
+"""FinBrain MCP."""
 
-        __version__ = version("finbrain-mcp")
-    except Exception:
-        __version__ = "0.0.0"
+from __future__ import annotations
+from importlib.metadata import PackageNotFoundError, version as _v
+
+try:  # installed (wheel / sdist / editable)
+    __version__ = _v("finbrain-mcp")  # PyPI distribution name
+except PackageNotFoundError:  # fresh git clone, not installed
+    __version__ = "0.0.0.dev0"
+
+__all__ = ["__version__"]
