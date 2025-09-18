@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=69", "setuptools-scm>=8", "wheel", "build"]
+requires = ["setuptools>=65", "setuptools-scm>=8", "wheel", "build"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -26,3 +26,5 @@ finbrain-mcp = "finbrain_mcp.server:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 exclude = ["tests*"]
+
+[tool.setuptools_scm]
