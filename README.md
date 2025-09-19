@@ -44,7 +44,7 @@ Backed by the official **`finbrain-python`** SDK.
         
 -   🧹 Consistent, model-friendly shapes (we normalize raw API responses)
     
--   🔑 Multiple ways to provide your API key: env var, file, or OS keyring
+-   🔑 Multiple ways to provide your API key: env var, file
     
 
 ----------
@@ -63,7 +63,7 @@ pip install --upgrade finbrain-mcp
 ```bash
 # from repo root
 python -m venv .venv
-source .venv/bin/activate              # Windows: .\.venv\Scripts\activate
+source .venv/bin/activate # Windows: .\.venv\Scripts\activate
 pip install -e ".[dev]"
 ```
 
@@ -197,7 +197,6 @@ which finbrain-mcp    # macOS/Linux
 }
 ```
 
-> Tip: You can omit the `env` block if you used `finbrain-mcp-login`.  
 > After editing, **quit & reopen Claude**.
 
 ### VS Code (MCP)
@@ -277,15 +276,24 @@ pip install -e ".[dev]"  # run tests pytest -q
 ### Project structure (high level)
 
 ```
-src/finbrain_mcp/
-  server.py # MCP server entrypoint
-  registry.py # FastMCP instance
-  client_adapter.py # wraps finbrain-python and normalizes outputs
-  auth.py # resolves API key (env/file/keyring)
-  utils.py # generic helpers (paging, CSV, DF->records) normalizers/ # endpoint-specific shapers
-tools/ # MCP tool functions (registered & testable)
-tests/ # pytest suite with a fake SDK
-examples/ # sample client configs
+finbrain-mcp
+├─ README.md
+├─ pyproject.toml
+├─ LICENSE
+├─ .github/
+├─ examples/
+├─ src/
+│  └─ finbrain_mcp/
+│     ├─ __init__.py
+│     ├─ server.py                # MCP server entrypoint
+│     ├─ registry.py              # FastMCP instance
+│     ├─ client_adapter.py        # wraps finbrain-python; calls normalizers
+│     ├─ auth.py                  # resolves API key (env var)
+│     ├─ settings.py              # tweakable defaults (e.g., series limits)
+│     ├─ utils.py                 # helpers (latest_slice, CSV, DF->records)
+│     ├─ normalizers/             # endpoint-specific shapers
+│     └─ tools/                   # MCP tool functions (registered & testable)
+└─ tests/                         # pytest suite with a fake SDK
 ```
 
 ----------
@@ -303,8 +311,6 @@ examples/ # sample client configs
 -   **`FinBrain API key not configured`**
     
     -   Put `FINBRAIN_API_KEY` in the client’s `env` block **or**
-        
-    -   Run `finbrain-mcp-login` (install `keyring` if missing) **or**
         
     -   `setx FINBRAIN_API_KEY "YOUR_KEY"` and fully restart the client.
         

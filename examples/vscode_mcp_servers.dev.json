@@ -1,5 +1,5 @@
 {
-  "mcpServers": {
+  "servers": {
     "finbrain-dev": {
       "command": "C:\\path\\to\\repo\\.venv\\Scripts\\python.exe",
       "args": ["-m", "finbrain_mcp.server"],

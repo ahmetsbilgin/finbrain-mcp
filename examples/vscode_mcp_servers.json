@@ -1,5 +1,5 @@
 {
-  "mcpServers": {
+  "servers": {
     "finbrain": {
       "command": "finbrain-mcp",
       "env": {
