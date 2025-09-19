@@ -4,6 +4,7 @@
 [![CI](https://github.com/ahmetsbilgin/finbrain-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/ahmetsbilgin/finbrain-mcp/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE)
 
+> **Requires Python 3.10+**
 
 A **Model Context Protocol (MCP)** server that exposes FinBrain datasets to AI clients (Claude Desktop, VS Code MCP extensions, etc.) via simple tools.  
 Backed by the official **`finbrain-python`** SDK.
@@ -50,28 +51,23 @@ Backed by the official **`finbrain-python`** SDK.
 
 ## Install
 
-### Option A — Isolated install (recommended)
-```
-# macOS/Linux
-pipx install finbrain-mcp
-pipx upgrade finbrain-mcp
-```
+### Option A — Standard install (pip)
 
-```
-# Windows
-pipx install finbrain-mcp
-pipx upgrade finbrain-mcp
+```bash
+# macOS / Linux / Windows
+pip install --upgrade finbrain-mcp
 ```
 
 ### Option B — Dev install (editable)
-```
+
+```bash
 # from repo root
 python -m venv .venv
 source .venv/bin/activate              # Windows: .\.venv\Scripts\activate
 pip install -e ".[dev]"
 ```
 
-> Keep **pipx** (prod) and your **venv** (dev) separate to avoid path mix-ups.
+> Keep **pip** (prod) and your **venv** (dev) separate to avoid path mix-ups.
 
 ----------
 
@@ -81,8 +77,9 @@ pip install -e ".[dev]"
 
 Put the key directly in the MCP server entry your client uses (Claude Desktop or a VS Code MCP extension). This guarantees the launched server sees it, even if system env vars aren’t picked up.
 
-#### Claude Desktop (pip/pipx install):
-```
+#### Claude Desktop (pip install):
+
+```json
 {
   "mcpServers": {
     "finbrain": {
@@ -97,7 +94,7 @@ Put the key directly in the MCP server entry your client uses (Claude Desktop or
 
 This works too, but note you must restart the client after setting it so the new value is inherited.
 
-```
+```bash
 # macOS/Linux
 export FINBRAIN_API_KEY="YOUR_KEY"
 
@@ -113,7 +110,10 @@ setx FINBRAIN_API_KEY "YOUR_KEY"
 
 ## Run the server
 
--   If installed (pipx/pip):
+> **Note:** You typically don’t need to run the server manually—your MCP client (Claude/VS Code) starts it automatically. Use the commands below only for manual checks or debugging.
+
+
+-   If installed (pip):
     
     `finbrain-mcp` 
     
@@ -136,6 +136,9 @@ PY
 
 ## Connect an AI client
 
+> **No manual start needed:** Claude Desktop and VS Code will **launch the MCP server for you** based on your config. You only need to run `finbrain-mcp` yourself for quick sanity checks or debugging.
+
+
 ### Claude Desktop
 
 Edit your config:
@@ -147,9 +150,9 @@ Edit your config:
 -   Linux: `~/.config/Claude/claude_desktop_config.json`
     
 
-**Pipx install (published package):**
+**Pip install (published package):**
 
-```
+```json
 {
   "mcpServers": {
     "finbrain": {
@@ -161,9 +164,28 @@ Edit your config:
 
 ```
 
+**macOS tip (full path):** If `"command": "finbrain-mcp"` doesn’t work, find the absolute path and use that instead.
+
+```bash
+which finbrain-mcp    # macOS/Linux
+# (Windows: where finbrain-mcp)
+```
+
+**Claude config with full path (macOS example):**
+```json
+{
+  "mcpServers": {
+    "finbrain": {
+      "command": "/usr/local/bin/finbrain-mcp",
+      "env": { "FINBRAIN_API_KEY": "YOUR_KEY" }
+    }
+  }
+}
+```
+
 **Dev venv (run the module explicitly):**
 
-```
+```json
 {
   "mcpServers": {
     "finbrain-dev": {
@@ -178,13 +200,15 @@ Edit your config:
 > Tip: You can omit the `env` block if you used `finbrain-mcp-login`.  
 > After editing, **quit & reopen Claude**.
 
-### VS Code (MCP-capable extensions)
+### VS Code (MCP)
 
-Most accept a similar JSON:
+1. Open the Command Palette → **“MCP: Open User Configuration”**.  
+   This opens your `mcp.json` (user profile).
+2. Add the server under the **`servers`** key:
 
-```
+```json
 {
-  "mcpServers": {
+  "servers": {
     "finbrain": {
       "command": "finbrain-mcp",
       "env": { "FINBRAIN_API_KEY": "YOUR_KEY" }
@@ -193,89 +217,57 @@ Most accept a similar JSON:
 }
 ```
 
+3. In Copilot Chat, enable Agent Mode to use MCP tools.
+
 ----------
 
-## Using the tools
+## What can you ask the agent?
 
-All tools return JSON by default and support paging; many also support CSV via `format="csv"`.
+You don’t need to know tool names—just ask in plain English. Examples:
 
-### Availability
+- **Predictions**
+  - “Get FinBrain’s **daily predictions** for **AMZN**.”
+  - “Show **monthly predictions** (12-month horizon) for **AMZN**.”
 
-- `available_markets()`  
-  → `["S&P 500", "NASDAQ", ...]`
+- **News sentiment**
+  - “What’s the **news sentiment** for **AMZN** **from 2025-01-01 to 2025-03-31** (limit 50)?”
+  - “Export **AMZN** news sentiment for **2025 YTD** **as CSV**.”
 
-- `available_tickers({ "dataset": "daily" })`  
-  or `{ "dataset": "monthly" }` (defaults to `"daily"` if omitted)  
-  → `[{"ticker": "AMZN", "name": "Amazon.com, Inc.", "market": "S&P 500"}, ...]`
-    
+- **App ratings**
+  - “Fetch **app store ratings** for **AMZN** between **2025-01-01** and **2025-06-30**.”
 
-### Predictions
+- **Analyst ratings**
+  - “List **analyst ratings** for **AMZN** in **Q1 2025**.”
 
-- `predictions_by_market({ "market": "S&P 500", "limit": 100 })`  
-  Returns the **latest** rows (sorted by `last_update`) with flat fields:
-  `expected_short|mid|long`, `sentiment_score`, `last_update`, `type`, …
+- **House trades**
+  - “Show **recent House trades** involving **AMZN**.”
 
-- `predictions_by_ticker({ "ticker": "AMZN", "prediction_type": "daily" })`  
-  Or `"monthly"` for 12-month horizon. Returns metadata +  
-  `series: [{date, mid, low, high}]` and `sentiment: [{date, score}]`.
-        
+- **Insider transactions**
+  - “Recent **insider transactions** for **AMZN**?”
 
-### Sentiment
+- **LinkedIn metrics**
+  - “Get **LinkedIn employee & follower counts** for **AMZN** (last 12 months).”
 
--   `news_sentiment_by_ticker({ "market": "S&P 500", "ticker": "AMZN", "limit": 30 })`
-    
-    -   `series: [{date, score}]`
-        
+- **Options (put/call)**
+  - “What’s the **put/call ratio** for **AMZN** over the **last 60 days**?”
 
-### App Ratings
+- **Availability**
+  - “Which **markets** are available?”
+  - “List **tickers** in the **daily** predictions universe.”
 
--   `app_ratings_by_ticker({ "market": "S&P 500", "ticker": "AMZN", "limit": 50 })`
-    
-    -   `series: [{date, play_store_score, play_store_ratings_count, app_store_score, app_store_ratings_count, play_store_install_count}]`
-        
 
-### Analyst Ratings
+> **Notes**
+> - Date format: `YYYY-MM-DD`.
+> - Time-series endpoints return the **most recent N** points by default—say “limit 200” to get more.
+> - Predictions horizon: **daily** (10-day) or **monthly** (12-month).
+> - Say “**as CSV**” to receive CSV instead of JSON.
 
--   `analyst_ratings_by_ticker({ "market": "S&P 500", "ticker": "AMZN" })`
-    
-    -   `series: [{date, rating_type, institution, signal, target_price_from, target_price_to, target_price_raw}]`
-        
-
-### House Trades
-
--   `house_trades_by_ticker({ "market": "S&P 500", "ticker": "AMZN" })`
-    
-    -   `series: [{date, representative, trade_type, amount_min, amount_max, amount_exact, amount_raw}]`
-        
-
-### Insider Transactions
-
--   `insider_transactions_by_ticker({ "market": "S&P 500", "ticker": "AMZN" })`
-    
-    -   `series: [{date, date_raw, insider_name, relationship, transaction_type, price, shares, usd_value, total_shares, sec_form4_date, sec_form4_datetime, sec_form4_link}]`
-        
-
-### LinkedIn
-
--   `linkedin_metrics_by_ticker({ "market": "S&P 500", "ticker": "AMZN" })`
-    
-    -   `series: [{date, employee_count, followers_count}]`
-        
-
-### Options (Put/Call)
-
--   `options_put_call({ "market": "S&P 500", "ticker": "AMZN" })`
-    
-    -   `series: [{date, put_call_ratio, call_count, put_count}]`
-        
-
-> Most tools accept `offset` & `limit`, and `format: "csv"` to get CSV text of the sliced series.
 
 ----------
 
 ## Development
 
-```
+```bash
 # setup
 python -m venv .venv
 source .venv/bin/activate # Windows: .\.venv\Scripts\activate
@@ -318,7 +310,7 @@ examples/ # sample client configs
         
 -   **Mixing dev & prod installs**
     
-    -   Keep **pipx** (prod) and **venv** (dev) separate.
+    -   Keep **pip** (prod) and **venv** (dev) separate.
         
     -   In configs, point to one or the other—not both.
         
