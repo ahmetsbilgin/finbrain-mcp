@@ -9,43 +9,41 @@
 A **Model Context Protocol (MCP)** server that exposes FinBrain datasets to AI clients (Claude Desktop, VS Code MCP extensions, etc.) via simple tools.  
 Backed by the official **`finbrain-python`** SDK.
 
--   Package name: **`finbrain-mcp`**
-    
--   CLI entrypoint: **`finbrain-mcp`**
-    
+- Package name: **`finbrain-mcp`**
+
+- CLI entrypoint: **`finbrain-mcp`**
 
 ----------
 
 ## What you get
 
--   ⚡️ **Local** MCP server (no proxying) using your **own FinBrain API key**
-    
--   🧰 Tools (JSON by default, CSV optional) with paging
-    
-    -   `health`
-        
-    -   `available_markets`, `available_tickers`
-        
-    -   `predictions_by_market`, `predictions_by_ticker`
-        
-    -   `news_sentiment_by_ticker`
-        
-    -   `app_ratings_by_ticker`
-        
-    -   `analyst_ratings_by_ticker`
-        
-    -   `house_trades_by_ticker`
-        
-    -   `insider_transactions_by_ticker`
-        
-    -   `linkedin_metrics_by_ticker`
-        
-    -   `options_put_call`
-        
--   🧹 Consistent, model-friendly shapes (we normalize raw API responses)
-    
--   🔑 Multiple ways to provide your API key: env var, file
-    
+- ⚡️ **Local** MCP server (no proxying) using your **own FinBrain API key**
+
+- 🧰 Tools (JSON by default, CSV optional) with paging
+
+  - `health`
+
+  - `available_markets`, `available_tickers`
+
+  - `predictions_by_market`, `predictions_by_ticker`
+
+  - `news_sentiment_by_ticker`
+
+  - `app_ratings_by_ticker`
+
+  - `analyst_ratings_by_ticker`
+
+  - `house_trades_by_ticker`
+
+  - `insider_transactions_by_ticker`
+
+  - `linkedin_metrics_by_ticker`
+
+  - `options_put_call`
+
+- 🧹 Consistent, model-friendly shapes (we normalize raw API responses)
+
+- 🔑 Multiple ways to provide your API key: env var, file
 
 ----------
 
@@ -77,7 +75,7 @@ pip install -e ".[dev]"
 
 Put the key directly in the MCP server entry your client uses (Claude Desktop or a VS Code MCP extension). This guarantees the launched server sees it, even if system env vars aren’t picked up.
 
-#### Claude Desktop (pip install):
+#### Claude Desktop (pip install)
 
 ```json
 {
@@ -88,7 +86,7 @@ Put the key directly in the MCP server entry your client uses (Claude Desktop or
     }
   }
 }
-``` 
+```
 
 ### B) Environment variable
 
@@ -104,7 +102,8 @@ $env:FINBRAIN_API_KEY="YOUR_KEY"
 # Windows (persistent for new processes)
 setx FINBRAIN_API_KEY "YOUR_KEY"
 # then fully quit and reopen your MCP client (e.g., Claude Desktop)
-``` 
+```
+
 >**Tip:** If the env var route doesn’t seem to work (common on Windows if the client was already running), use the **config JSON `env`** method above—it’s more deterministic.
 ----------
 
@@ -112,19 +111,17 @@ setx FINBRAIN_API_KEY "YOUR_KEY"
 
 > **Note:** You typically don’t need to run the server manually—your MCP client (Claude/VS Code) starts it automatically. Use the commands below only for manual checks or debugging.
 
+- If installed (pip):
 
--   If installed (pip):
-    
-    `finbrain-mcp` 
-    
--   From a dev venv:
-    
-    `python -m finbrain_mcp.server` 
-    
+    `finbrain-mcp`
+
+- From a dev venv:
+
+    `python -m finbrain_mcp.server`
 
 Quick health check without an MCP client:
 
-```
+```python
 python - <<'PY'
 import json
 from finbrain_mcp.tools.health import health
@@ -138,17 +135,15 @@ PY
 
 > **No manual start needed:** Claude Desktop and VS Code will **launch the MCP server for you** based on your config. You only need to run `finbrain-mcp` yourself for quick sanity checks or debugging.
 
-
 ### Claude Desktop
 
 Edit your config:
 
--   Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-    
--   macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-    
--   Linux: `~/.config/Claude/claude_desktop_config.json`
-    
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+- Linux: `~/.config/Claude/claude_desktop_config.json`
 
 **Pip install (published package):**
 
@@ -172,6 +167,7 @@ which finbrain-mcp    # macOS/Linux
 ```
 
 **Claude config with full path (macOS example):**
+
 ```json
 {
   "mcpServers": {
@@ -205,16 +201,16 @@ which finbrain-mcp    # macOS/Linux
    This opens your `mcp.json` (user profile).
 2. Add the server under the **`servers`** key:
 
-```json
-{
-  "servers": {
-    "finbrain": {
-      "command": "finbrain-mcp",
-      "env": { "FINBRAIN_API_KEY": "YOUR_KEY" }
+    ```json
+    {
+      "servers": {
+        "finbrain": {
+          "command": "finbrain-mcp",
+          "env": { "FINBRAIN_API_KEY": "YOUR_KEY" }
+        }
+      }
     }
-  }
-}
-```
+    ```
 
 3. In Copilot Chat, enable Agent Mode to use MCP tools.
 
@@ -254,13 +250,12 @@ You don’t need to know tool names—just ask in plain English. Examples:
   - “Which **markets** are available?”
   - “List **tickers** in the **daily** predictions universe.”
 
-
 > **Notes**
+>
 > - Date format: `YYYY-MM-DD`.
 > - Time-series endpoints return the **most recent N** points by default—say “limit 200” to get more.
 > - Predictions horizon: **daily** (10-day) or **monthly** (12-month).
 > - Say “**as CSV**” to receive CSV instead of JSON.
-
 
 ----------
 
@@ -275,7 +270,7 @@ pip install -e ".[dev]"  # run tests pytest -q
 
 ### Project structure (high level)
 
-```
+```text
 finbrain-mcp
 ├─ README.md
 ├─ pyproject.toml
@@ -300,26 +295,25 @@ finbrain-mcp
 
 ## Troubleshooting
 
--   **`ENOENT`** (can’t start server)
-    
-    -   Wrong path in client config. Use the venv’s **exact** path:
-        
-        -   `…\.venv\Scripts\python.exe` + `["-m","finbrain_mcp.server"]`, or
-            
-        -   `…\.venv\Scripts\finbrain-mcp.exe`
-            
--   **`FinBrain API key not configured`**
-    
-    -   Put `FINBRAIN_API_KEY` in the client’s `env` block **or**
-        
-    -   `setx FINBRAIN_API_KEY "YOUR_KEY"` and fully restart the client.
-        
--   **Mixing dev & prod installs**
-    
-    -   Keep **pip** (prod) and **venv** (dev) separate.
-        
-    -   In configs, point to one or the other—not both.
-        
+- **`ENOENT`** (can’t start server)
+
+  - Wrong path in client config. Use the venv’s **exact** path:
+
+    - `…\.venv\Scripts\python.exe` + `["-m","finbrain_mcp.server"]`, or
+
+    - `…\.venv\Scripts\finbrain-mcp.exe`
+
+- **`FinBrain API key not configured`**
+
+  - Put `FINBRAIN_API_KEY` in the client’s `env` block **or**
+
+  - `setx FINBRAIN_API_KEY "YOUR_KEY"` and fully restart the client.
+
+- **Mixing dev & prod installs**
+
+  - Keep **pip** (prod) and **venv** (dev) separate.
+
+  - In configs, point to one or the other—not both.
 
 ----------
 
@@ -331,9 +325,10 @@ MIT (see `LICENSE`).
 
 ## Acknowledgements
 
--   Built on Model Context Protocol and **FastMCP**.
-    
--   Uses the official **`finbrain-python`** SDK.
+- Built on Model Context Protocol and **FastMCP**.
+
+- Uses the official **`finbrain-python`** SDK.
+
 ----------
 
 © 2025 FinBrain Technologies — Built with ❤️ for the quant community.
