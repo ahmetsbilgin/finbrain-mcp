@@ -67,6 +67,18 @@ pip install -e ".[dev]"
 
 > Keep **pip** (prod) and your **venv** (dev) separate to avoid path mix-ups.
 
+### Option C — Docker
+
+```bash
+# Build the image
+docker build -t finbrain-mcp:latest .
+
+# Run with your API key
+docker run --rm -e FINBRAIN_API_KEY="YOUR_KEY" finbrain-mcp:latest
+```
+
+> See [DOCKER.md](DOCKER.md) for detailed Docker usage instructions.
+
 ----------
 
 ## Configure your FinBrain API key
@@ -187,6 +199,20 @@ which finbrain-mcp    # macOS/Linux
     "finbrain-dev": {
       "command": "C:\\Users\\you\\path\\to\\repo\\.venv\\Scripts\\python.exe",
       "args": ["-m", "finbrain_mcp.server"],
+      "env": { "FINBRAIN_API_KEY": "YOUR_KEY" }
+    }
+  }
+}
+```
+
+**Docker:**
+
+```json
+{
+  "mcpServers": {
+    "finbrain": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "finbrain-mcp:latest"],
       "env": { "FINBRAIN_API_KEY": "YOUR_KEY" }
     }
   }
