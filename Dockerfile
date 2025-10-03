@@ -4,18 +4,17 @@ FROM python:3.11-slim AS builder
 # Set working directory
 WORKDIR /app
 
-# Install build dependencies including git (needed for setuptools-scm)
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends git && \
-    rm -rf /var/lib/apt/lists/* && \
-    pip install --no-cache-dir --upgrade pip setuptools wheel
+# Install build dependencies
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Copy project files
 COPY pyproject.toml ./
 COPY README.md ./
 COPY LICENSE ./
 COPY src/ ./src/
-COPY .git/ ./.git/
+
+# Set version for setuptools-scm when .git is not available
+ENV SETUPTOOLS_SCM_PRETEND_VERSION=0.1.5
 
 # Install the package
 RUN pip install --no-cache-dir .
