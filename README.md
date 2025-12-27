@@ -171,7 +171,9 @@ Edit your config:
 
 ```
 
-**macOS tip (full path):** If `"command": "finbrain-mcp"` doesn’t work, find the absolute path and use that instead.
+**macOS tip (full path):**
+
+If `"command": "finbrain-mcp"` doesn’t work, find the absolute path and use that instead.
 
 ```bash
 which finbrain-mcp    # macOS/Linux
@@ -184,7 +186,7 @@ which finbrain-mcp    # macOS/Linux
 {
   "mcpServers": {
     "finbrain": {
-      "command": "/usr/local/bin/finbrain-mcp",
+      "command": "/full/path/to/finbrain-mcp",
       "env": { "FINBRAIN_API_KEY": "YOUR_KEY" }
     }
   }
