@@ -9,6 +9,7 @@ from .normalizers import (
     normalize_app_ratings_ticker,
     normalize_analyst_ratings_ticker,
     normalize_house_trades_ticker,
+    normalize_senate_trades_ticker,
     normalize_insider_transactions_ticker,
     normalize_linkedin_ticker,
     normalize_options_put_call_ticker,
@@ -63,6 +64,15 @@ class FBClient:
             market, ticker, date_from=date_from, date_to=date_to, as_dataframe=False
         )
         return normalize_house_trades_ticker(raw)
+
+    # ---------- senate trades ----------
+    def senate_trades_ticker(
+        self, market: str, ticker: str, date_from: str | None, date_to: str | None
+    ) -> Any:
+        raw = self.fb.senate_trades.ticker(
+            market, ticker, date_from=date_from, date_to=date_to, as_dataframe=False
+        )
+        return normalize_senate_trades_ticker(raw)
 
     # ---------- insider transactions ----------
     def insider_transactions_ticker(self, market: str, ticker: str) -> Any:

@@ -13,6 +13,32 @@ Backed by the official **`finbrain-python`** SDK.
 
 - CLI entrypoint: **`finbrain-mcp`**
 
+- Documentation: **[finbrain.tech/integrations/mcp](https://finbrain.tech/integrations/mcp/)**
+
+----------
+
+## Features
+
+### AI-Powered Price Predictions
+
+Access FinBrain's machine learning price forecasts with daily (10-day) and monthly (12-month) horizons. Includes mean predictions with 95% confidence intervals.
+
+### News Sentiment Analysis
+
+Track aggregated sentiment scores derived from financial news coverage. Monitor how market sentiment shifts over time for any ticker.
+
+### Alternative Data
+
+- **LinkedIn Metrics** — Employee count and follower trends as company health indicators
+- **App Store Ratings** — Mobile app performance data for consumer-facing companies
+- **Options Flow** — Put/call ratios and volume to gauge market positioning
+
+### Institutional & Insider Activity
+
+- **US Congress Trades** — Stock transactions disclosed by House representatives and Senators
+- **Insider Transactions** — SEC Form 4 filings showing executive buys and sells
+- **Analyst Ratings** — Wall Street coverage and price target changes
+
 ----------
 
 ## What you get
@@ -33,7 +59,7 @@ Backed by the official **`finbrain-python`** SDK.
 
   - `analyst_ratings_by_ticker`
 
-  - `house_trades_by_ticker`
+  - `house_trades_by_ticker`, `senate_trades_by_ticker`
 
   - `insider_transactions_by_ticker`
 
@@ -262,8 +288,9 @@ You don’t need to know tool names—just ask in plain English. Examples:
 - **Analyst ratings**
   - “List **analyst ratings** for **AMZN** in **Q1 2025**.”
 
-- **House trades**
-  - “Show **recent House trades** involving **AMZN**.”
+- **Congressional trades**
+  - "Show **recent House trades** involving **AMZN**."
+  - "Show **recent Senate trades** involving **META**."
 
 - **Insider transactions**
   - “Recent **insider transactions** for **AMZN**?”

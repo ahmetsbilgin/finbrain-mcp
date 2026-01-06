@@ -200,6 +200,35 @@ class _HouseTrades:
         }
 
 
+class _SenateTrades:
+    def ticker(
+        self,
+        market: str,
+        ticker: str,
+        date_from=None,
+        date_to=None,
+        as_dataframe: bool = False,
+    ):
+        return {
+            "ticker": ticker,
+            "name": "Meta Platforms Inc." if ticker == "META" else ticker,
+            "senateTrades": [
+                {
+                    "date": "2025-11-13",
+                    "amount": "$1,001 - $15,000",
+                    "senator": "Shelley Moore Capito",
+                    "type": "Purchase",
+                },
+                {
+                    "date": "2025-10-31",
+                    "amount": "$1,001 - $15,000",
+                    "senator": "John Boozman",
+                    "type": "Purchase",
+                },
+            ],
+        }
+
+
 class _InsiderTransactions:
     def ticker(self, market: str, ticker: str, as_dataframe: bool = False):
         return {
@@ -298,6 +327,7 @@ class FakeFinBrainSDK:
         self.app_ratings = _AppRatings()
         self.analyst_ratings = _AnalystRatings()
         self.house_trades = _HouseTrades()
+        self.senate_trades = _SenateTrades()
         self.insider_transactions = _InsiderTransactions()
         self.linkedin_data = _LinkedIn()
         self.options = _Options()
