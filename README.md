@@ -386,4 +386,4 @@ MIT (see `LICENSE`).
 
 ----------
 
-© 2025 FinBrain Technologies — Built with ❤️ for the quant community.
+© 2026 FinBrain Technologies — Built with ❤️ for the quant community.
