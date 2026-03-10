@@ -7,7 +7,7 @@ from ..client_adapter import FBClient
 from ..utils import latest_slice, rows_to_csv
 
 
-class HouseTradesReq(BaseModel):
+class NewsReq(BaseModel):
     ticker: str
     date_from: Optional[str] = Field(None, description="YYYY-MM-DD")
     date_to: Optional[str] = Field(None, description="YYYY-MM-DD")
@@ -15,20 +15,19 @@ class HouseTradesReq(BaseModel):
     format: Literal["json", "csv"] = "json"
 
 
-def house_trades_by_ticker(req: HouseTradesReq):
+def news_by_ticker(req: NewsReq):
     """
-    Normalized US House trades:
+    Returns recent news articles for a ticker:
       {
         format: "json",
         ticker, name,
-        series: [{date, representative, trade_type,
-                  amount_min, amount_max, amount_exact, amount_raw}, ...],
+        series: [{date, headline, source, url}, ...]  (paged),
         series_count, series_total
       }
-    CSV returns the sliced `series`.
+    If format="csv", returns CSV of the sliced series.
     """
     client = FBClient(resolve_api_key())
-    obj = client.house_trades_ticker(
+    obj = client.news_ticker(
         req.ticker, req.date_from, req.date_to
     ) or {"ticker": req.ticker, "name": None, "series": []}
     series = obj.get("series", [])
@@ -47,5 +46,4 @@ def house_trades_by_ticker(req: HouseTradesReq):
     }
 
 
-# Register with MCP while keeping function callable for tests
-mcp.tool()(house_trades_by_ticker)
+mcp.tool()(news_by_ticker)

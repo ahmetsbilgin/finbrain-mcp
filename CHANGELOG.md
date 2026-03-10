@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-03-10
+
+### Added
+
+- `news_by_ticker` tool — recent news articles with per-article sentiment for a single ticker
+- `available_regions` tool — list markets grouped by region
+- `recent_news` tool — latest news articles across all tracked stocks
+- `recent_analyst_ratings` tool — latest analyst ratings across all tracked stocks
+- 9 screener tools for cross-ticker screening:
+  - `screener_sentiment`, `screener_analyst_ratings`, `screener_news`
+  - `screener_insider_trading`, `screener_house_trades`, `screener_senate_trades`
+  - `screener_put_call_ratio`, `screener_linkedin`, `screener_app_ratings`
+
+### Changed
+
+- **BREAKING:** Migrated from FinBrain API v1 to v2
+  - The `market` parameter has been removed from all per-symbol tool inputs (`news_sentiment_by_ticker`, `app_ratings_by_ticker`, `analyst_ratings_by_ticker`, `house_trades_by_ticker`, `senate_trades_by_ticker`, `insider_transactions_by_ticker`, `linkedin_metrics_by_ticker`, `options_put_call`)
+  - `predictions_by_market` now uses the v2 screener endpoint and accepts optional `market`, `region`, and `prediction_type` parameters instead of a required `market`
+  - `insider_transactions_by_ticker` now supports `date_from` and `date_to` parameters
+- Upgraded `fastmcp` dependency from v2 to v3
+- Upgraded `finbrain-python` dependency from v0.1.x to v0.2.0
+- Rewrote all normalizers for v2 response shapes (field renames, restructured data keys, nested objects)
+- Updated fake SDK fixtures and all tests for v2 compatibility
+
 ## [0.1.6] - 2026-01-07
 
 ### Added
@@ -88,6 +112,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Linting with ruff
 - Example configurations for Claude Desktop and VS Code
 
+[0.2.0]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.1.6...v0.2.0
 [0.1.6]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.1.3...v0.1.4

@@ -3,7 +3,7 @@ from finbrain_mcp.tools import senate_trades as mod
 
 def test_senate_trades_normalized_json(patch_resolvers):
     patch_resolvers(mod)
-    req = mod.SenateTradesReq(market="S&P 500", ticker="META", limit=2)
+    req = mod.SenateTradesReq(ticker="META", limit=2)
     out = mod.senate_trades_by_ticker(req)
     assert out["format"] == "json"
     assert out["ticker"] == "META"
@@ -28,7 +28,7 @@ def test_senate_trades_normalized_json(patch_resolvers):
 
 def test_senate_trades_csv(patch_resolvers):
     patch_resolvers(mod)
-    req = mod.SenateTradesReq(market="S&P 500", ticker="META", format="csv", limit=2)
+    req = mod.SenateTradesReq(ticker="META", format="csv", limit=2)
     out = mod.senate_trades_by_ticker(req)
     assert out["format"] == "csv"
     header = out["data"].splitlines()[0]

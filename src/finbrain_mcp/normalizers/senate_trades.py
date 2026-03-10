@@ -29,13 +29,14 @@ def _parse_amount(s: Any) -> Tuple[float | None, float | None, bool]:
 
 def normalize_senate_trades_ticker(obj: Any) -> Dict:
     """
-    RAW:
+    V2 RAW (after SDK envelope unwrap):
     {
-      "ticker": "META",
+      "symbol": "META",
       "name": "Meta Platforms Inc.",
-      "senateTrades": [
-        {"date":"2025-11-13","amount":"$1,001 - $15,000","senator":"Shelley Moore Capito","type":"Purchase"},
-        {"date":"2025-10-31","amount":"$1,001 - $15,000","senator":"John Boozman","type":"Purchase"},
+      "chamber": "senate",
+      "trades": [
+        {"date": "2025-11-13", "politician": "Shelley Moore Capito",
+         "transactionType": "Purchase", "amount": "$1,001 - $15,000"},
         ...
       ]
     }
@@ -44,16 +45,16 @@ def normalize_senate_trades_ticker(obj: Any) -> Dict:
       "ticker": "META",
       "name": "...",
       "series": [
-        {"date":"2025-10-31","senator":"John Boozman","trade_type":"Purchase",
-         "amount_min":1001.0,"amount_max":15000.0,"amount_exact":False,"amount_raw":"$1,001 - $15,000"},
-        {"date":"2025-11-13","senator":"Shelley Moore Capito","trade_type":"Purchase",
-         "amount_min":1001.0,"amount_max":15000.0,"amount_exact":False,"amount_raw":"$1,001 - $15,000"},
+        {"date": "2025-11-13", "senator": "Shelley Moore Capito",
+         "trade_type": "Purchase",
+         "amount_min": 1001.0, "amount_max": 15000.0,
+         "amount_exact": False, "amount_raw": "$1,001 - $15,000"},
         ...
       ]
     }
     """
     obj = obj or {}
-    rows = obj.get("senateTrades") or []
+    rows = obj.get("trades") or []
     series: List[Dict] = []
     for it in rows:
         if not isinstance(it, dict):
@@ -62,8 +63,8 @@ def normalize_senate_trades_ticker(obj: Any) -> Dict:
         series.append(
             {
                 "date": it.get("date"),
-                "senator": it.get("senator"),
-                "trade_type": it.get("type"),
+                "senator": it.get("politician"),
+                "trade_type": it.get("transactionType"),
                 "amount_min": mn,
                 "amount_max": mx,
                 "amount_exact": exact,
@@ -71,4 +72,4 @@ def normalize_senate_trades_ticker(obj: Any) -> Dict:
             }
         )
     series.sort(key=lambda r: r["date"])
-    return {"ticker": obj.get("ticker"), "name": obj.get("name"), "series": series}
+    return {"ticker": obj.get("symbol"), "name": obj.get("name"), "series": series}

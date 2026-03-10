@@ -3,7 +3,7 @@ from finbrain_mcp.tools import options as mod
 
 def test_options_put_call_json_series(patch_resolvers):
     patch_resolvers(mod)
-    req = mod.PutCallReq(market="S&P 500", ticker="AMZN", limit=1)
+    req = mod.PutCallReq(ticker="AMZN", limit=1)
     out = mod.options_put_call(req)
     assert out["format"] == "json"
     assert out["ticker"] == "AMZN"
@@ -21,7 +21,7 @@ def test_options_put_call_json_series(patch_resolvers):
 
 def test_options_put_call_csv(patch_resolvers):
     patch_resolvers(mod)
-    req = mod.PutCallReq(market="S&P 500", ticker="AMZN", format="csv", limit=2)
+    req = mod.PutCallReq(ticker="AMZN", format="csv", limit=2)
     out = mod.options_put_call(req)
     assert out["format"] == "csv"
     header = out["data"].splitlines()[0]

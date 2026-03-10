@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Literal
+from typing import Optional, Literal
 from pydantic import BaseModel, Field
 from ..registry import mcp
 from ..auth import resolve_api_key
@@ -7,8 +7,10 @@ from ..client_adapter import FBClient
 from ..utils import latest_slice, rows_to_csv
 
 
-class PredictionsMarketReq(BaseModel):
-    market: str
+class PredictionsScreenerReq(BaseModel):
+    prediction_type: Literal["daily", "monthly"] = "daily"
+    market: Optional[str] = Field(None, description="e.g., 'S&P 500'")
+    region: Optional[str] = Field(None, description="e.g., 'US'")
     limit: int = Field(1000, ge=1, le=10000)
     format: Literal["json", "csv"] = "json"
 
@@ -19,12 +21,18 @@ class PredictionsTickerReq(BaseModel):
     format: Literal["json", "csv"] = "json"
 
 
-def predictions_by_market(req: PredictionsMarketReq):
+def predictions_by_market(req: PredictionsScreenerReq):
     """
-    Normalized market predictions (flat rows with expected_* floats & sentiment_score).
+    Screener-based market predictions (flat rows with expected_* percentages).
+    Filters by market name or region.
     """
     client = FBClient(resolve_api_key())
-    rows = client.predictions_market(req.market) or []
+    rows = client.screener_predictions(
+        prediction_type=req.prediction_type,
+        market=req.market,
+        region=req.region,
+        limit=req.limit,
+    ) or []
     rows = latest_slice(rows, req.limit)
     if req.format == "csv":
         return {"format": "csv", "data": rows_to_csv(rows)}
@@ -35,9 +43,8 @@ def predictions_by_ticker(req: PredictionsTickerReq):
     """
     Normalized ticker prediction with a time series:
       {
-        ticker, name, type, last_update, expected_short/mid/long, technical_analysis,
+        ticker, name, type, last_update, expected_short/mid/long,
         series: [{date, mid, low, high}, ...],
-        sentiment: [{date, score}, ...]
       }
     """
     client = FBClient(resolve_api_key())
@@ -47,7 +54,6 @@ def predictions_by_ticker(req: PredictionsTickerReq):
         "ticker": req.ticker,
         "name": None,
         "series": [],
-        "sentiment": [],
     }
 
     if req.format == "csv":
@@ -62,10 +68,8 @@ def predictions_by_ticker(req: PredictionsTickerReq):
         "expected_short": obj.get("expected_short"),
         "expected_mid": obj.get("expected_mid"),
         "expected_long": obj.get("expected_long"),
-        "technical_analysis": obj.get("technical_analysis"),
         "series": obj.get("series", []),
         "series_total": len(obj.get("series", [])),
-        "sentiment": obj.get("sentiment", []),
     }
 
 

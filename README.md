@@ -6,8 +6,8 @@
 
 > **Requires Python 3.10+**
 
-A **Model Context Protocol (MCP)** server that exposes FinBrain datasets to AI clients (Claude Desktop, VS Code MCP extensions, etc.) via simple tools.  
-Backed by the official **`finbrain-python`** SDK.
+A **Model Context Protocol (MCP)** server that exposes FinBrain datasets to AI clients (Claude Desktop, VS Code MCP extensions, etc.) via simple tools.
+Backed by the official **`finbrain-python`** SDK (v2 API).
 
 - Package name: **`finbrain-mcp`**
 
@@ -23,9 +23,9 @@ Backed by the official **`finbrain-python`** SDK.
 
 Access FinBrain's machine learning price forecasts with daily (10-day) and monthly (12-month) horizons. Includes mean predictions with 95% confidence intervals.
 
-### News Sentiment Analysis
+### News & Sentiment Analysis
 
-Track aggregated sentiment scores derived from financial news coverage. Monitor how market sentiment shifts over time for any ticker.
+Browse recent news articles for any ticker, or track aggregated daily sentiment scores over time. Screen news across all tracked stocks.
 
 ### Alternative Data
 
@@ -49,11 +49,11 @@ Track aggregated sentiment scores derived from financial news coverage. Monitor 
 
   - `health`
 
-  - `available_markets`, `available_tickers`
+  - `available_markets`, `available_tickers`, `available_regions`
 
   - `predictions_by_market`, `predictions_by_ticker`
 
-  - `news_sentiment_by_ticker`
+  - `news_by_ticker`, `news_sentiment_by_ticker`
 
   - `app_ratings_by_ticker`
 
@@ -66,6 +66,14 @@ Track aggregated sentiment scores derived from financial news coverage. Monitor 
   - `linkedin_metrics_by_ticker`
 
   - `options_put_call`
+
+  - `recent_news`, `recent_analyst_ratings`
+
+  - `screener_sentiment`, `screener_analyst_ratings`, `screener_news`
+
+  - `screener_insider_trading`, `screener_house_trades`, `screener_senate_trades`
+
+  - `screener_put_call_ratio`, `screener_linkedin`, `screener_app_ratings`
 
 - 🧹 Consistent, model-friendly shapes (we normalize raw API responses)
 
@@ -277,10 +285,12 @@ You don’t need to know tool names—just ask in plain English. Examples:
 - **Predictions**
   - “Get FinBrain’s **daily predictions** for **AMZN**.”
   - “Show **monthly predictions** (12-month horizon) for **AMZN**.”
+  - “Get **market-wide daily predictions** for **S&P 500** tickers.”
 
-- **News sentiment**
+- **News**
+  - “Get **recent news articles** for **AMZN**.”
   - “What’s the **news sentiment** for **AMZN** **from 2025-01-01 to 2025-03-31** (limit 50)?”
-  - “Export **AMZN** news sentiment for **2025 YTD** **as CSV**.”
+  - “Show me the **latest news** across all **S&P 500** stocks.”
 
 - **App ratings**
   - “Fetch **app store ratings** for **AMZN** between **2025-01-01** and **2025-06-30**.”
@@ -289,8 +299,8 @@ You don’t need to know tool names—just ask in plain English. Examples:
   - “List **analyst ratings** for **AMZN** in **Q1 2025**.”
 
 - **Congressional trades**
-  - "Show **recent House trades** involving **AMZN**."
-  - "Show **recent Senate trades** involving **META**."
+  - “Show **recent House trades** involving **AMZN**.”
+  - “Show **recent Senate trades** involving **META**.”
 
 - **Insider transactions**
   - “Recent **insider transactions** for **AMZN**?”
@@ -301,9 +311,16 @@ You don’t need to know tool names—just ask in plain English. Examples:
 - **Options (put/call)**
   - “What’s the **put/call ratio** for **AMZN** over the **last 60 days**?”
 
+- **Screeners (cross-ticker)**
+  - “Screen **sentiment** across **S&P 500** stocks.”
+  - “Show the **latest analyst ratings** across all stocks.”
+  - “Screen **insider trades** across all tickers (limit 50).”
+  - “Screen **LinkedIn data** for **US** region stocks.”
+
 - **Availability**
   - “Which **markets** are available?”
   - “List **tickers** in the **daily** predictions universe.”
+  - “Show available **regions** and their markets.”
 
 > **Notes**
 >
@@ -311,6 +328,7 @@ You don’t need to know tool names—just ask in plain English. Examples:
 > - Time-series endpoints return the **most recent N** points by default—say “limit 200” to get more.
 > - Predictions horizon: **daily** (10-day) or **monthly** (12-month).
 > - Say “**as CSV**” to receive CSV instead of JSON.
+> - No need to specify a market—just use the ticker symbol directly.
 
 ----------
 

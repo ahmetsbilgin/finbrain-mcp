@@ -23,5 +23,12 @@ def available_tickers(req: TickersReq):
     return client.available_tickers(req.dataset)
 
 
+def available_regions():
+    """List markets grouped by region. Use region codes for filtering in other endpoints."""
+    client = FBClient(resolve_api_key())
+    return client.available_regions()
+
+
 mcp.tool()(available_markets)
 mcp.tool()(available_tickers)
+mcp.tool()(available_regions)

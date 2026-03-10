@@ -14,6 +14,9 @@ from .tools import linkedin  # noqa: F401
 from .tools import options  # noqa: F401
 from .tools import predictions  # noqa: F401
 from .tools import sentiments  # noqa: F401
+from .tools import news  # noqa: F401
+from .tools import recent  # noqa: F401
+from .tools import screener  # noqa: F401
 from .tools import health  # noqa: F401
 
 

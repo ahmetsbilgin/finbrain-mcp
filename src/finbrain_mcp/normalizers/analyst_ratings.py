@@ -24,12 +24,14 @@ def _parse_price_pair(s: Any) -> tuple[float | None, float | None]:
 
 def normalize_analyst_ratings_ticker(obj: Any) -> Dict:
     """
-    RAW:
+    V2 RAW (after SDK envelope unwrap):
     {
-      "ticker": "AMZN",
+      "symbol": "AMZN",
       "name": "Amazon.com Inc.",
-      "analystRatings": [
-        {"date":"2024-02-02","type":"Reiterated","institution":"Piper Sandler","signal":"Neutral","targetPrice":"$205 → $190"},
+      "ratings": [
+        {"date": "2024-02-02", "institution": "Piper Sandler",
+         "action": "Reiterated", "rating": "Neutral",
+         "targetPrice": "$205 → $190"},
         ...
       ]
     }
@@ -51,7 +53,7 @@ def normalize_analyst_ratings_ticker(obj: Any) -> Dict:
     }
     """
     obj = obj or {}
-    arr = obj.get("analystRatings") or []
+    arr = obj.get("ratings") or []
     series: List[Dict] = []
     for it in arr:
         if not isinstance(it, dict):
@@ -60,9 +62,9 @@ def normalize_analyst_ratings_ticker(obj: Any) -> Dict:
         series.append(
             {
                 "date": it.get("date"),
-                "rating_type": it.get("type"),
+                "rating_type": it.get("action"),
                 "institution": it.get("institution"),
-                "signal": it.get("signal"),
+                "signal": it.get("rating"),
                 "target_price_from": p_from,
                 "target_price_to": p_to,
                 "target_price_raw": it.get("targetPrice"),
@@ -70,7 +72,7 @@ def normalize_analyst_ratings_ticker(obj: Any) -> Dict:
         )
     series.sort(key=lambda r: r["date"])
     return {
-        "ticker": obj.get("ticker"),
+        "ticker": obj.get("symbol"),
         "name": obj.get("name"),
         "series": series,
     }

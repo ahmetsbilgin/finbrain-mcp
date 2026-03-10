@@ -3,18 +3,17 @@ from finbrain_mcp.tools import predictions as mod
 
 def test_predictions_market(patch_resolvers):
     patch_resolvers(mod)
-    req = mod.PredictionsMarketReq(market="S&P 500", limit=1)
+    req = mod.PredictionsScreenerReq(prediction_type="daily", limit=1)
     out = mod.predictions_by_market(req)
     assert out["count"] == 1
     row = out["rows"][0]
-    # flattened normalized keys (no nested "prediction")
+    # flattened normalized keys
     for key in [
         "ticker",
         "expected_short",
         "expected_mid",
         "expected_long",
         "last_update",
-        "type",
     ]:
         assert key in row
 

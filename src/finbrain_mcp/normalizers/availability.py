@@ -4,10 +4,19 @@ from typing import Any, List
 
 def normalize_available_markets(obj: Any) -> List[str]:
     """
-    RAW:
-      {"availableMarkets": ["S&P 500", "NASDAQ", ...]}
-    or in some cases already a list.
+    V2 RAW (after SDK envelope unwrap):
+    The SDK returns a list of market objects:
+      [{"name": "S&P 500", ...}, {"name": "NASDAQ", ...}, ...]
+    or in some cases already a list of strings.
+
+    -> ["S&P 500", "NASDAQ", ...]
     """
-    if isinstance(obj, dict) and isinstance(obj.get("availableMarkets"), list):
-        return obj["availableMarkets"]
-    return obj if isinstance(obj, list) else []
+    if not isinstance(obj, list):
+        return []
+    if not obj:
+        return []
+    # v2: list of dicts with "name" key
+    if isinstance(obj[0], dict):
+        return [it.get("name", "") for it in obj if isinstance(it, dict)]
+    # fallback: already a list of strings
+    return obj

@@ -1,42 +1,43 @@
 from __future__ import annotations
 from typing import Any, List, Dict
-from .shared import to_float, parse_mid_low_high, pct_to_text
+from .shared import to_float, pct_to_text
 
 
-def normalize_market_predictions(items: Any) -> List[Dict]:
+def normalize_screener_predictions(items: Any) -> List[Dict]:
     """
-    RAW list:
-      {
-        "ticker": "STX",
-        "name": "Seagate Technology",
-        "prediction": {
-          "expectedShort": "1.24632", "expectedMid": "...", "expectedLong": "...",
-          "technicalAnalysis": "...", "lastUpdate": "...", "type": "daily"
-        },
-        "sentimentScore": "-0.137"
-      }
-    -> flat rows with numeric fields parsed
+    V2 screener predictions (after SDK unwrap).
+    Items is a list of per-ticker prediction summaries returned by
+    /screener/predictions/daily or /screener/predictions/monthly.
+
+    Each item shape:
+    {
+      "symbol": "STX",
+      "name": "Seagate Technology",
+      "expectedShortTerm": 1.24,
+      "expectedMidTerm": 2.56,
+      "expectedLongTerm": 3.12,
+      "lastUpdated": "2026-01-19T..."
+    }
+
+    -> flat rows with percent-formatted expected returns.
     """
     out: list[dict] = []
     if not isinstance(items, list):
         return out
     for it in items:
-        pred = (it or {}).get("prediction", {}) if isinstance(it, dict) else {}
-        short_pct = to_float(pred.get("expectedShort"))
-        mid_pct = to_float(pred.get("expectedMid"))
-        long_pct = to_float(pred.get("expectedLong"))
+        if not isinstance(it, dict):
+            continue
+        short_pct = to_float(it.get("expectedShortTerm"))
+        mid_pct = to_float(it.get("expectedMidTerm"))
+        long_pct = to_float(it.get("expectedLongTerm"))
         out.append(
             {
-                "ticker": it.get("ticker"),
+                "ticker": it.get("symbol"),
                 "name": it.get("name"),
-                # single, unambiguous representation (percent string)
                 "expected_short": pct_to_text(short_pct),
                 "expected_mid": pct_to_text(mid_pct),
                 "expected_long": pct_to_text(long_pct),
-                "technical_analysis": pred.get("technicalAnalysis"),
-                "last_update": pred.get("lastUpdate"),
-                "type": pred.get("type"),
-                "sentiment_score": to_float(it.get("sentimentScore")),
+                "last_update": it.get("lastUpdated"),
             }
         )
     return out
@@ -44,53 +45,55 @@ def normalize_market_predictions(items: Any) -> List[Dict]:
 
 def normalize_ticker_predictions(obj: Any) -> Dict:
     """
-    RAW object:
-      {
-        "ticker": "AAPL",
-        "name": "Apple Inc.",
-        "prediction": {
-          "YYYY-MM-DD": "mid,low,high",
-          "expectedShort": "0.22", "expectedMid": "0.58", "expectedLong": "0.25",
-          "technicalAnalysis": "...", "type": "daily", "lastUpdate": "..."
-        },
-        "sentimentAnalysis": { "YYYY-MM-DD": "0.186", ... }
-      }
-    -> normalized object with `series` and `sentiment` arrays, floats parsed.
+    V2 RAW (after SDK envelope unwrap):
+    {
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "type": "daily",
+      "predictions": [
+        {"date": "2026-01-16", "mid": 255.21, "lower": 251.01, "upper": 259.48},
+        ...
+      ],
+      "metadata": {
+        "expectedShortTerm": 0.17,
+        "expectedMidTerm": 0.47,
+        "expectedLongTerm": 1.22,
+        "lowerBoundChange": -3.95,
+        "upperBoundChange": 6.67
+      },
+      "lastUpdated": "2026-01-19T15:05:59.853Z"
+    }
+
+    -> normalized object with `series` array and parsed metadata.
     """
     obj = obj or {}
-    pred = obj.get("prediction", {}) if isinstance(obj, dict) else {}
-    # extract meta
-    short_pct = to_float(pred.get("expectedShort"))
-    mid_pct = to_float(pred.get("expectedMid"))
-    long_pct = to_float(pred.get("expectedLong"))
+    meta = obj.get("metadata") or {}
+    short_pct = to_float(meta.get("expectedShortTerm"))
+    mid_pct = to_float(meta.get("expectedMidTerm"))
+    long_pct = to_float(meta.get("expectedLongTerm"))
+
+    preds = obj.get("predictions") or []
     series: list[dict] = []
-    for k, v in pred.items():
-        if k in {
-            "expectedShort",
-            "expectedMid",
-            "expectedLong",
-            "technicalAnalysis",
-            "type",
-            "lastUpdate",
-        }:
+    for p in preds:
+        if not isinstance(p, dict):
             continue
-        series.append({"date": k, **parse_mid_low_high(v)})
+        series.append(
+            {
+                "date": p.get("date"),
+                "mid": to_float(p.get("mid")),
+                "low": to_float(p.get("lower")),
+                "high": to_float(p.get("upper")),
+            }
+        )
     series.sort(key=lambda r: r["date"])
 
-    sent = obj.get("sentimentAnalysis") or {}
-    sentiment = [{"date": d, "score": to_float(s)} for d, s in sent.items()]
-    sentiment.sort(key=lambda r: r["date"])
-
     return {
-        "ticker": obj.get("ticker"),
+        "ticker": obj.get("symbol"),
         "name": obj.get("name"),
-        "type": pred.get("type"),
-        "last_update": pred.get("lastUpdate"),
-        # single, unambiguous representation (percent string)
+        "type": obj.get("type"),
+        "last_update": obj.get("lastUpdated"),
         "expected_short": pct_to_text(short_pct),
         "expected_mid": pct_to_text(mid_pct),
         "expected_long": pct_to_text(long_pct),
-        "technical_analysis": pred.get("technicalAnalysis"),
         "series": series,
-        "sentiment": sentiment,
     }

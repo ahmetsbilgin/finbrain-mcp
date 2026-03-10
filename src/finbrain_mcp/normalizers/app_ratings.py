@@ -5,18 +5,15 @@ from .shared import to_float, to_int
 
 def normalize_app_ratings_ticker(obj: Any) -> Dict:
     """
-    RAW:
+    V2 RAW (after SDK envelope unwrap):
     {
-      "ticker": "AMZN",
+      "symbol": "AMZN",
       "name": "Amazon.com Inc",
-      "appRatings": [
+      "data": [
         {
-          "playStoreScore": 3.75,
-          "playStoreRatingsCount": 567996,
-          "appStoreScore": 4.07,
-          "appStoreRatingsCount": 88533,
-          "playStoreInstallCount": null,
-          "date": "2024-02-02"
+          "date": "2024-02-02",
+          "ios": {"score": 4.07, "ratingsCount": 88533},
+          "android": {"score": 3.75, "ratingsCount": 567996, "installCount": null}
         },
         ...
       ]
@@ -39,24 +36,26 @@ def normalize_app_ratings_ticker(obj: Any) -> Dict:
     }
     """
     obj = obj or {}
-    arr = obj.get("appRatings") or []
+    arr = obj.get("data") or []
     series: List[Dict] = []
     for it in arr:
         if not isinstance(it, dict):
             continue
+        ios = it.get("ios") or {}
+        android = it.get("android") or {}
         series.append(
             {
                 "date": it.get("date"),
-                "play_store_score": to_float(it.get("playStoreScore")),
-                "play_store_ratings_count": to_int(it.get("playStoreRatingsCount")),
-                "app_store_score": to_float(it.get("appStoreScore")),
-                "app_store_ratings_count": to_int(it.get("appStoreRatingsCount")),
-                "play_store_install_count": to_int(it.get("playStoreInstallCount")),
+                "play_store_score": to_float(android.get("score")),
+                "play_store_ratings_count": to_int(android.get("ratingsCount")),
+                "app_store_score": to_float(ios.get("score")),
+                "app_store_ratings_count": to_int(ios.get("ratingsCount")),
+                "play_store_install_count": to_int(android.get("installCount")),
             }
         )
     series.sort(key=lambda r: r["date"])
     return {
-        "ticker": obj.get("ticker"),
+        "ticker": obj.get("symbol"),
         "name": obj.get("name"),
         "series": series,
     }

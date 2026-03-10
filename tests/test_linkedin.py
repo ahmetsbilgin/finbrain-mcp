@@ -3,7 +3,7 @@ from finbrain_mcp.tools import linkedin as mod
 
 def test_linkedin_metrics_json_series(patch_resolvers):
     patch_resolvers(mod)
-    req = mod.LinkedInReq(market="S&P 500", ticker="AMZN", limit=1)
+    req = mod.LinkedInReq(ticker="AMZN", limit=1)
     out = mod.linkedin_metrics_by_ticker(req)
     assert out["format"] == "json"
     assert out["ticker"] == "AMZN"
@@ -18,7 +18,7 @@ def test_linkedin_metrics_json_series(patch_resolvers):
 
 def test_linkedin_metrics_csv(patch_resolvers):
     patch_resolvers(mod)
-    req = mod.LinkedInReq(market="S&P 500", ticker="AMZN", format="csv", limit=2)
+    req = mod.LinkedInReq(ticker="AMZN", format="csv", limit=2)
     out = mod.linkedin_metrics_by_ticker(req)
     assert out["format"] == "csv"
     header = out["data"].splitlines()[0]

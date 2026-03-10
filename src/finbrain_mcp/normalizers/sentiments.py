@@ -5,24 +5,28 @@ from .shared import to_float
 
 def normalize_sentiments_ticker(obj: Any) -> Dict:
     """
-    RAW:
+    V2 RAW (after SDK envelope unwrap):
     {
-      "ticker": "AMZN",
-      "name": "Amazon.com Inc.",
-      "sentimentAnalysis": {
-          "2021-12-15": "0.223",
-          "2021-12-14": "0.037",
-          "2021-12-13": "-0.038"
-      }
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "data": [
+        {"date": "2026-01-19", "score": 0.265},
+        {"date": "2026-01-16", "score": 0.346},
+        ...
+      ]
     }
     -> {"ticker","name","series":[{"date","score"},...]}  (dates sorted)
     """
     obj = obj or {}
-    sa = obj.get("sentimentAnalysis") or {}
-    series: List[Dict] = [{"date": d, "score": to_float(v)} for d, v in sa.items()]
-    series.sort(key=lambda r: r["date"])  # ascending date order
+    arr = obj.get("data") or []
+    series: List[Dict] = [
+        {"date": it.get("date"), "score": to_float(it.get("score"))}
+        for it in arr
+        if isinstance(it, dict)
+    ]
+    series.sort(key=lambda r: r["date"])
     return {
-        "ticker": obj.get("ticker"),
+        "ticker": obj.get("symbol"),
         "name": obj.get("name"),
         "series": series,
     }

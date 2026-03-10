@@ -14,7 +14,7 @@ COPY LICENSE ./
 COPY src/ ./src/
 
 # Set version for setuptools-scm when .git is not available
-ENV SETUPTOOLS_SCM_PRETEND_VERSION=0.1.5
+ENV SETUPTOOLS_SCM_PRETEND_VERSION=0.2.0
 
 # Install the package
 RUN pip install --no-cache-dir .

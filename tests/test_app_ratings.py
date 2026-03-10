@@ -3,7 +3,7 @@ from finbrain_mcp.tools import app_ratings as mod
 
 def test_app_ratings_json_series(patch_resolvers):
     patch_resolvers(mod)
-    req = mod.AppRatingsReq(market="S&P 500", ticker="AMZN", limit=1)
+    req = mod.AppRatingsReq(ticker="AMZN", limit=1)
     out = mod.app_ratings_by_ticker(req)
     assert out["format"] == "json"
     assert out["ticker"] == "AMZN"
@@ -32,7 +32,7 @@ def test_app_ratings_json_series(patch_resolvers):
 
 def test_app_ratings_csv(patch_resolvers):
     patch_resolvers(mod)
-    req = mod.AppRatingsReq(market="S&P 500", ticker="AMZN", format="csv", limit=2)
+    req = mod.AppRatingsReq(ticker="AMZN", format="csv", limit=2)
     out = mod.app_ratings_by_ticker(req)
     assert out["format"] == "csv"
     header = out["data"].splitlines()[0]

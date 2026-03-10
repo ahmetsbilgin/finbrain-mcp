@@ -3,7 +3,7 @@ from finbrain_mcp.tools import house_trades as mod
 
 def test_house_trades_normalized_json(patch_resolvers):
     patch_resolvers(mod)
-    req = mod.HouseTradesReq(market="S&P 500", ticker="AMZN", limit=2)
+    req = mod.HouseTradesReq(ticker="AMZN", limit=2)
     out = mod.house_trades_by_ticker(req)
     assert out["format"] == "json"
     assert out["ticker"] == "AMZN"
@@ -28,7 +28,7 @@ def test_house_trades_normalized_json(patch_resolvers):
 
 def test_house_trades_csv(patch_resolvers):
     patch_resolvers(mod)
-    req = mod.HouseTradesReq(market="S&P 500", ticker="AMZN", format="csv", limit=2)
+    req = mod.HouseTradesReq(ticker="AMZN", format="csv", limit=2)
     out = mod.house_trades_by_ticker(req)
     assert out["format"] == "csv"
     header = out["data"].splitlines()[0]

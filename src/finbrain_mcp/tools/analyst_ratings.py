@@ -8,7 +8,6 @@ from ..utils import latest_slice, rows_to_csv
 
 
 class AnalystRatingsReq(BaseModel):
-    market: str
     ticker: str
     date_from: Optional[str] = Field(None, description="YYYY-MM-DD")
     date_to: Optional[str] = Field(None, description="YYYY-MM-DD")
@@ -30,7 +29,7 @@ def analyst_ratings_by_ticker(req: AnalystRatingsReq):
     """
     client = FBClient(resolve_api_key())
     obj = client.analyst_ratings_ticker(
-        req.market, req.ticker, req.date_from, req.date_to
+        req.ticker, req.date_from, req.date_to
     ) or {"ticker": req.ticker, "name": None, "series": []}
     series = obj.get("series", [])
     series_slice = latest_slice(series, req.limit)

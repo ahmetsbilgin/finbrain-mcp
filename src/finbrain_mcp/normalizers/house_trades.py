@@ -29,13 +29,14 @@ def _parse_amount(s: Any) -> Tuple[float | None, float | None, bool]:
 
 def normalize_house_trades_ticker(obj: Any) -> Dict:
     """
-    RAW:
+    V2 RAW (after SDK envelope unwrap):
     {
-      "ticker": "AMZN",
+      "symbol": "AMZN",
       "name": "Amazon.com Inc.",
-      "houseTrades": [
-        {"date":"2024-02-29","amount":"$360.00","representative":"Pete Sessions","type":"Purchase"},
-        {"date":"2024-01-25","amount":"$15,001 - $50,000","representative":"Shri Thanedar","type":"Sale"},
+      "chamber": "house",
+      "trades": [
+        {"date": "2024-02-29", "politician": "Pete Sessions",
+         "transactionType": "Purchase", "amount": "$360.00"},
         ...
       ]
     }
@@ -44,16 +45,16 @@ def normalize_house_trades_ticker(obj: Any) -> Dict:
       "ticker": "AMZN",
       "name": "...",
       "series": [
-        {"date":"2024-01-25","representative":"Shri Thanedar","trade_type":"Sale",
-         "amount_min":15001.0,"amount_max":50000.0,"amount_exact":False,"amount_raw":"$15,001 - $50,000"},
-        {"date":"2024-02-29","representative":"Pete Sessions","trade_type":"Purchase",
-         "amount_min":360.0,"amount_max":360.0,"amount_exact":True,"amount_raw":"$360.00"},
+        {"date": "2024-02-29", "representative": "Pete Sessions",
+         "trade_type": "Purchase",
+         "amount_min": 360.0, "amount_max": 360.0,
+         "amount_exact": True, "amount_raw": "$360.00"},
         ...
       ]
     }
     """
     obj = obj or {}
-    rows = obj.get("houseTrades") or []
+    rows = obj.get("trades") or []
     series: List[Dict] = []
     for it in rows:
         if not isinstance(it, dict):
@@ -62,8 +63,8 @@ def normalize_house_trades_ticker(obj: Any) -> Dict:
         series.append(
             {
                 "date": it.get("date"),
-                "representative": it.get("representative"),
-                "trade_type": it.get("type"),
+                "representative": it.get("politician"),
+                "trade_type": it.get("transactionType"),
                 "amount_min": mn,
                 "amount_max": mx,
                 "amount_exact": exact,
@@ -71,4 +72,4 @@ def normalize_house_trades_ticker(obj: Any) -> Dict:
             }
         )
     series.sort(key=lambda r: r["date"])
-    return {"ticker": obj.get("ticker"), "name": obj.get("name"), "series": series}
+    return {"ticker": obj.get("symbol"), "name": obj.get("name"), "series": series}

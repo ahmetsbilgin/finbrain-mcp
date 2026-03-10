@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Literal
+from typing import Optional, Literal
 from pydantic import BaseModel, Field
 from ..registry import mcp
 from ..auth import resolve_api_key
@@ -8,8 +8,9 @@ from ..utils import latest_slice, rows_to_csv
 
 
 class InsiderReq(BaseModel):
-    market: str
     ticker: str
+    date_from: Optional[str] = Field(None, description="YYYY-MM-DD")
+    date_to: Optional[str] = Field(None, description="YYYY-MM-DD")
     limit: int = Field(100, ge=1, le=5000)
     format: Literal["json", "csv"] = "json"
 
@@ -21,15 +22,17 @@ def insider_transactions_by_ticker(req: InsiderReq):
       {
         format: "json",
         ticker, name,
-        series: [{date, date_raw, insider_name, relationship, transaction_type,
+        series: [{date, insider_name, relationship, transaction_type,
                   price, shares, usd_value, total_shares,
-                  sec_form4_date, sec_form4_datetime, sec_form4_link}, ...],
+                  sec_form4_date, sec_form4_link}, ...],
         series_count, series_total
       }
     CSV: sliced `series` as CSV.
     """
     client = FBClient(resolve_api_key())
-    obj = client.insider_transactions_ticker(req.market, req.ticker) or {
+    obj = client.insider_transactions_ticker(
+        req.ticker, date_from=req.date_from, date_to=req.date_to
+    ) or {
         "ticker": req.ticker,
         "name": None,
         "series": [],
