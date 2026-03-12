@@ -13,7 +13,7 @@ requires-python = ">=3.10"
 dependencies = [
   "fastmcp>=3,<4",
   "pydantic>=2",
-  "finbrain-python>=0.2.0",
+  "finbrain-python>=0.2.1",
 ]
 
 [project.optional-dependencies]

@@ -138,6 +138,17 @@ class TestSenateTrades:
 
 
 # ---------------------------------------------------------------------------
+# corporate lobbying
+# ---------------------------------------------------------------------------
+
+class TestCorporateLobbying:
+    def test_ticker(self):
+        obj = _client().corporate_lobbying_ticker(TICKER, None, None)
+        _assert_series_shape(obj, {"date", "filing_uuid", "filing_year", "quarter",
+                                   "client_name", "registrant_name", "income", "expenses"})
+
+
+# ---------------------------------------------------------------------------
 # insider transactions
 # ---------------------------------------------------------------------------
 
@@ -197,3 +208,14 @@ class TestToolRoundTrip:
         lines = out["data"].strip().splitlines()
         assert len(lines) >= 2  # header + at least 1 row
         assert "put_call_ratio" in lines[0]
+
+    def test_corporate_lobbying(self):
+        from finbrain_mcp.tools.corporate_lobbying import (
+            corporate_lobbying_by_ticker,
+            CorporateLobbyingReq,
+        )
+
+        out = corporate_lobbying_by_ticker(CorporateLobbyingReq(ticker=TICKER, limit=5))
+        assert out["format"] == "json"
+        assert out["ticker"] == TICKER
+        assert out["series_count"] <= 5

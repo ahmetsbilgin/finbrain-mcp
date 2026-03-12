@@ -407,6 +407,48 @@ class _SenateTrades:
         }
 
 
+class _CorporateLobbying:
+    def ticker(
+        self,
+        symbol: str,
+        date_from=None,
+        date_to=None,
+        as_dataframe: bool = False,
+        **kw,
+    ):
+        # V2: filings array with lobbying data
+        return {
+            "symbol": symbol,
+            "name": "Apple Inc." if symbol == "AAPL" else symbol,
+            "filings": [
+                {
+                    "date": "2024-01-15",
+                    "filingUuid": "uuid-001",
+                    "filingYear": 2024,
+                    "quarter": "Q1",
+                    "clientName": "Apple Inc.",
+                    "registrantName": "Fierce Government Relations",
+                    "income": 150000,
+                    "expenses": 120000,
+                    "issueCodes": ["TAX", "TEC"],
+                    "governmentEntities": ["U.S. Senate", "U.S. House of Representatives"],
+                },
+                {
+                    "date": "2023-10-20",
+                    "filingUuid": "uuid-002",
+                    "filingYear": 2023,
+                    "quarter": "Q4",
+                    "clientName": "Apple Inc.",
+                    "registrantName": "Franklin Square Group",
+                    "income": 200000,
+                    "expenses": 180000,
+                    "issueCodes": ["CPT", "IMM"],
+                    "governmentEntities": ["U.S. Senate"],
+                },
+            ],
+        }
+
+
 class _InsiderTransactions:
     def ticker(
         self,
@@ -523,6 +565,7 @@ class FakeFinBrainSDK:
         self.analyst_ratings = _AnalystRatings()
         self.house_trades = _HouseTrades()
         self.senate_trades = _SenateTrades()
+        self.corporate_lobbying = _CorporateLobbying()
         self.insider_transactions = _InsiderTransactions()
         self.linkedin_data = _LinkedIn()
         self.options = _Options()

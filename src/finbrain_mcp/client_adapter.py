@@ -10,6 +10,7 @@ from .normalizers import (
     normalize_analyst_ratings_ticker,
     normalize_house_trades_ticker,
     normalize_senate_trades_ticker,
+    normalize_corporate_lobbying_ticker,
     normalize_insider_transactions_ticker,
     normalize_linkedin_ticker,
     normalize_options_put_call_ticker,
@@ -85,6 +86,15 @@ class FBClient:
             ticker, date_from=date_from, date_to=date_to, as_dataframe=False
         )
         return normalize_senate_trades_ticker(raw)
+
+    # ---------- corporate lobbying ----------
+    def corporate_lobbying_ticker(
+        self, ticker: str, date_from: str | None, date_to: str | None
+    ) -> Any:
+        raw = self.fb.corporate_lobbying.ticker(
+            ticker, date_from=date_from, date_to=date_to, as_dataframe=False
+        )
+        return normalize_corporate_lobbying_ticker(raw)
 
     # ---------- insider transactions ----------
     def insider_transactions_ticker(

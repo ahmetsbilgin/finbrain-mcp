@@ -9,6 +9,7 @@ from .tools import app_ratings  # noqa: F401
 from .tools import analyst_ratings  # noqa: F401
 from .tools import house_trades  # noqa: F401
 from .tools import senate_trades  # noqa: F401
+from .tools import corporate_lobbying  # noqa: F401
 from .tools import insider_transactions  # noqa: F401
 from .tools import linkedin  # noqa: F401
 from .tools import options  # noqa: F401
