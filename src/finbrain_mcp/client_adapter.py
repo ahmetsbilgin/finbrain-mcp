@@ -23,6 +23,9 @@ from .normalizers import (
     normalize_screener_put_call,
     normalize_screener_linkedin,
     normalize_screener_app_ratings,
+    normalize_reddit_mentions_ticker,
+    normalize_screener_reddit_mentions,
+    normalize_screener_reddit_mentions_summary,
 )
 
 # SDK import (PyPI package name is finbrain-python; import path is `finbrain`)
@@ -274,6 +277,31 @@ class FBClient:
         )
         items = df_to_records_maybe(raw)
         return normalize_screener_linkedin(items)
+
+    # ---------- reddit mentions ----------
+    def reddit_mentions_ticker(
+        self, ticker: str, date_from: str | None, date_to: str | None
+    ) -> Any:
+        raw = self.fb.reddit_mentions.ticker(
+            ticker, date_from=date_from, date_to=date_to, as_dataframe=False
+        )
+        return normalize_reddit_mentions_ticker(raw)
+
+    def screener_reddit_mentions(
+        self,
+        market: str | None = None,
+        region: str | None = None,
+        limit: int | None = None,
+    ) -> Any:
+        raw = self.fb.screener.reddit_mentions(
+            market=market, region=region, limit=limit, as_dataframe=False
+        )
+        items = df_to_records_maybe(raw.get("data") if isinstance(raw, dict) else raw)
+        rows = normalize_screener_reddit_mentions(items)
+        summary = normalize_screener_reddit_mentions_summary(
+            raw.get("summary") if isinstance(raw, dict) else {}
+        )
+        return {"rows": rows, "summary": summary}
 
     def screener_app_ratings(
         self,

@@ -32,6 +32,7 @@ Browse recent news articles for any ticker, or track aggregated daily sentiment 
 - **LinkedIn Metrics** — Employee count and follower trends as company health indicators
 - **App Store Ratings** — Mobile app performance data for consumer-facing companies
 - **Options Flow** — Put/call ratios and volume to gauge market positioning
+- **Reddit Mentions** — Ticker mention counts across subreddits, collected every 4 hours
 
 ### Institutional & Insider Activity
 
@@ -70,13 +71,15 @@ Browse recent news articles for any ticker, or track aggregated daily sentiment 
 
   - `options_put_call`
 
+  - `reddit_mentions_by_ticker`
+
   - `recent_news`, `recent_analyst_ratings`
 
   - `screener_sentiment`, `screener_analyst_ratings`, `screener_news`
 
   - `screener_insider_trading`, `screener_house_trades`, `screener_senate_trades`
 
-  - `screener_put_call_ratio`, `screener_linkedin`, `screener_app_ratings`
+  - `screener_put_call_ratio`, `screener_linkedin`, `screener_app_ratings`, `screener_reddit_mentions`
 
 - 🧹 Consistent, model-friendly shapes (we normalize raw API responses)
 
@@ -318,11 +321,16 @@ You don’t need to know tool names—just ask in plain English. Examples:
 - **Options (put/call)**
   - “What’s the **put/call ratio** for **AMZN** over the **last 60 days**?”
 
+- **Reddit mentions**
+  - “Show **Reddit mentions** for **TSLA** over the **last week**.”
+  - “Which **subreddits** are talking about **AAPL** the most?”
+
 - **Screeners (cross-ticker)**
   - “Screen **sentiment** across **S&P 500** stocks.”
   - “Show the **latest analyst ratings** across all stocks.”
   - “Screen **insider trades** across all tickers (limit 50).”
   - “Screen **LinkedIn data** for **US** region stocks.”
+  - “What are the **most mentioned tickers** on **Reddit** right now?”
 
 - **Availability**
   - “Which **markets** are available?”

@@ -148,6 +148,23 @@ def screener_app_ratings(req: ScreenerMarketReq):
     return _screener_response(rows, req.limit, req.format)
 
 
+def screener_reddit_mentions(req: ScreenerOptionalMarketReq):
+    """
+    Screen Reddit mentions across tickers.
+    Returns rows with ticker, name, date, total_mentions, subreddits,
+    plus a summary with aggregate stats (top_mentioned, subreddit_names, etc.).
+    """
+    client = FBClient(resolve_api_key())
+    result = client.screener_reddit_mentions(
+        market=req.market, region=req.region, limit=req.limit
+    ) or {"rows": [], "summary": {}}
+    rows = result.get("rows", [])
+    resp = _screener_response(rows, req.limit, req.format)
+    if resp["format"] == "json":
+        resp["summary"] = result.get("summary", {})
+    return resp
+
+
 # Register all tools with MCP
 mcp.tool()(screener_sentiment)
 mcp.tool()(screener_analyst_ratings)
@@ -158,3 +175,4 @@ mcp.tool()(screener_news)
 mcp.tool()(screener_put_call_ratio)
 mcp.tool()(screener_linkedin)
 mcp.tool()(screener_app_ratings)
+mcp.tool()(screener_reddit_mentions)

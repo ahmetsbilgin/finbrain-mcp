@@ -217,6 +217,33 @@ class _Screener:
             },
         ]
 
+    def reddit_mentions(self, *, limit=None, market=None, region=None, as_dataframe=False):
+        return {
+            "data": [
+                {
+                    "symbol": "TSLA",
+                    "name": "Tesla, Inc.",
+                    "date": "2026-03-17T08:00:00.000Z",
+                    "totalMentions": 120,
+                    "subreddits": {"wallstreetbets": 85, "stocks": 12},
+                },
+                {
+                    "symbol": "AAPL",
+                    "name": "Apple Inc.",
+                    "date": "2026-03-17T08:00:00.000Z",
+                    "totalMentions": 45,
+                    "subreddits": {"wallstreetbets": 30, "investing": 15},
+                },
+            ],
+            "summary": {
+                "totalEntries": 2,
+                "totalTickers": 2,
+                "averageMentions": 82.5,
+                "topMentioned": ["TSLA", "AAPL"],
+                "subredditNames": ["wallstreetbets", "stocks", "investing"],
+            },
+        }
+
 
 class _Predictions:
     def ticker(
@@ -521,6 +548,44 @@ class _LinkedIn:
         }
 
 
+class _RedditMentions:
+    def ticker(
+        self,
+        symbol: str,
+        *,
+        date_from=None,
+        date_to=None,
+        limit=None,
+        as_dataframe: bool = False,
+    ):
+        return {
+            "symbol": symbol,
+            "name": "Tesla, Inc." if symbol == "TSLA" else symbol,
+            "data": [
+                {
+                    "date": "2026-03-17T08:00:00.000Z",
+                    "subreddit": "_all",
+                    "mentions": 120,
+                },
+                {
+                    "date": "2026-03-17T08:00:00.000Z",
+                    "subreddit": "wallstreetbets",
+                    "mentions": 85,
+                },
+                {
+                    "date": "2026-03-17T04:00:00.000Z",
+                    "subreddit": "_all",
+                    "mentions": 95,
+                },
+                {
+                    "date": "2026-03-17T04:00:00.000Z",
+                    "subreddit": "wallstreetbets",
+                    "mentions": 60,
+                },
+            ],
+        }
+
+
 class _Options:
     def put_call(
         self,
@@ -569,6 +634,7 @@ class FakeFinBrainSDK:
         self.insider_transactions = _InsiderTransactions()
         self.linkedin_data = _LinkedIn()
         self.options = _Options()
+        self.reddit_mentions = _RedditMentions()
         self.news = _News()
         self.recent = _Recent()
 

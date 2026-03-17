@@ -10,6 +10,11 @@ from .insider_transactions import normalize_insider_transactions_ticker
 from .linkedin import normalize_linkedin_ticker
 from .options import normalize_options_put_call_ticker
 from .news import normalize_news_ticker
+from .reddit_mentions import (
+    normalize_reddit_mentions_ticker,
+    normalize_screener_reddit_mentions,
+    normalize_screener_reddit_mentions_summary,
+)
 from .screener import (
     normalize_screener_sentiment,
     normalize_screener_analyst_ratings,
@@ -43,4 +48,7 @@ __all__ = [
     "normalize_screener_put_call",
     "normalize_screener_linkedin",
     "normalize_screener_app_ratings",
+    "normalize_reddit_mentions_ticker",
+    "normalize_screener_reddit_mentions",
+    "normalize_screener_reddit_mentions_summary",
 ]
