@@ -18,6 +18,7 @@ from .tools import sentiments  # noqa: F401
 from .tools import news  # noqa: F401
 from .tools import recent  # noqa: F401
 from .tools import reddit_mentions  # noqa: F401
+from .tools import government_contracts  # noqa: F401
 from .tools import screener  # noqa: F401
 from .tools import health  # noqa: F401
 

@@ -33,6 +33,7 @@ Browse recent news articles for any ticker, or track aggregated daily sentiment 
 - **App Store Ratings** — Mobile app performance data for consumer-facing companies
 - **Options Flow** — Put/call ratios and volume to gauge market positioning
 - **Reddit Mentions** — Ticker mention counts across subreddits, collected every 4 hours
+- **Government Contracts** — U.S. government contract awards from USAspending.gov
 
 ### Institutional & Insider Activity
 
@@ -73,13 +74,15 @@ Browse recent news articles for any ticker, or track aggregated daily sentiment 
 
   - `reddit_mentions_by_ticker`
 
+  - `government_contracts_by_ticker`
+
   - `recent_news`, `recent_analyst_ratings`
 
   - `screener_sentiment`, `screener_analyst_ratings`, `screener_news`
 
   - `screener_insider_trading`, `screener_house_trades`, `screener_senate_trades`
 
-  - `screener_put_call_ratio`, `screener_linkedin`, `screener_app_ratings`, `screener_reddit_mentions`
+  - `screener_put_call_ratio`, `screener_linkedin`, `screener_app_ratings`, `screener_reddit_mentions`, `screener_government_contracts`
 
 - 🧹 Consistent, model-friendly shapes (we normalize raw API responses)
 
@@ -324,6 +327,10 @@ You don’t need to know tool names—just ask in plain English. Examples:
 - **Reddit mentions**
   - “Show **Reddit mentions** for **TSLA** over the **last week**.”
   - “Which **subreddits** are talking about **AAPL** the most?”
+
+- **Government contracts**
+  - “Show **government contracts** awarded to **LMT** in **2025**.”
+  - “Which companies have the **largest government contract awards**?”
 
 - **Screeners (cross-ticker)**
   - “Screen **sentiment** across **S&P 500** stocks.”

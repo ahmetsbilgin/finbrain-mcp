@@ -149,6 +149,30 @@ class TestCorporateLobbying:
 
 
 # ---------------------------------------------------------------------------
+# government contracts
+# ---------------------------------------------------------------------------
+
+class TestGovernmentContracts:
+    def test_ticker(self):
+        obj = _client().government_contracts_ticker("LMT", None, None)
+        _assert_series_shape(obj, {"award_id", "award_amount", "awarding_agency",
+                                   "recipient_name", "start_date", "end_date",
+                                   "naics_code", "naics_description"})
+
+    def test_screener(self):
+        result = _client().screener_government_contracts(limit=5)
+        assert isinstance(result, dict)
+        rows = result.get("rows", [])
+        assert isinstance(rows, list)
+        assert len(rows) > 0
+        assert "ticker" in rows[0]
+        assert "award_amount" in rows[0]
+        summary = result.get("summary", {})
+        assert "total_contracts" in summary
+        assert "total_value" in summary
+
+
+# ---------------------------------------------------------------------------
 # insider transactions
 # ---------------------------------------------------------------------------
 
@@ -218,4 +242,15 @@ class TestToolRoundTrip:
         out = corporate_lobbying_by_ticker(CorporateLobbyingReq(ticker=TICKER, limit=5))
         assert out["format"] == "json"
         assert out["ticker"] == TICKER
+        assert out["series_count"] <= 5
+
+    def test_government_contracts(self):
+        from finbrain_mcp.tools.government_contracts import (
+            government_contracts_by_ticker,
+            GovernmentContractsReq,
+        )
+
+        out = government_contracts_by_ticker(GovernmentContractsReq(ticker="LMT", limit=5))
+        assert out["format"] == "json"
+        assert out["ticker"] == "LMT"
         assert out["series_count"] <= 5

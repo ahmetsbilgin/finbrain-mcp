@@ -26,6 +26,9 @@ from .normalizers import (
     normalize_reddit_mentions_ticker,
     normalize_screener_reddit_mentions,
     normalize_screener_reddit_mentions_summary,
+    normalize_government_contracts_ticker,
+    normalize_screener_government_contracts,
+    normalize_screener_government_contracts_summary,
 )
 
 # SDK import (PyPI package name is finbrain-python; import path is `finbrain`)
@@ -299,6 +302,26 @@ class FBClient:
         items = df_to_records_maybe(raw.get("data") if isinstance(raw, dict) else raw)
         rows = normalize_screener_reddit_mentions(items)
         summary = normalize_screener_reddit_mentions_summary(
+            raw.get("summary") if isinstance(raw, dict) else {}
+        )
+        return {"rows": rows, "summary": summary}
+
+    # ---------- government contracts ----------
+    def government_contracts_ticker(
+        self, ticker: str, date_from: str | None, date_to: str | None
+    ) -> Any:
+        raw = self.fb.government_contracts.ticker(
+            ticker, date_from=date_from, date_to=date_to, as_dataframe=False
+        )
+        return normalize_government_contracts_ticker(raw)
+
+    def screener_government_contracts(
+        self, limit: int | None = None
+    ) -> Any:
+        raw = self.fb.screener.government_contracts(limit=limit, as_dataframe=False)
+        items = df_to_records_maybe(raw.get("data") if isinstance(raw, dict) else raw)
+        rows = normalize_screener_government_contracts(items)
+        summary = normalize_screener_government_contracts_summary(
             raw.get("summary") if isinstance(raw, dict) else {}
         )
         return {"rows": rows, "summary": summary}

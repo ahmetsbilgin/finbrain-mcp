@@ -148,6 +148,24 @@ def screener_app_ratings(req: ScreenerMarketReq):
     return _screener_response(rows, req.limit, req.format)
 
 
+def screener_government_contracts(req: ScreenerLimitOnlyReq):
+    """
+    Screen U.S. government contract awards across all tickers.
+    Returns rows with ticker, name, award_id, award_amount, recipient_name,
+    start_date, awarding_agency, naics_description,
+    plus a summary with aggregate stats (total_contracts, total_tickers, total_value).
+    """
+    client = FBClient(resolve_api_key())
+    result = client.screener_government_contracts(
+        limit=req.limit
+    ) or {"rows": [], "summary": {}}
+    rows = result.get("rows", [])
+    resp = _screener_response(rows, req.limit, req.format)
+    if resp["format"] == "json":
+        resp["summary"] = result.get("summary", {})
+    return resp
+
+
 def screener_reddit_mentions(req: ScreenerOptionalMarketReq):
     """
     Screen Reddit mentions across tickers.
@@ -175,4 +193,5 @@ mcp.tool()(screener_news)
 mcp.tool()(screener_put_call_ratio)
 mcp.tool()(screener_linkedin)
 mcp.tool()(screener_app_ratings)
+mcp.tool()(screener_government_contracts)
 mcp.tool()(screener_reddit_mentions)

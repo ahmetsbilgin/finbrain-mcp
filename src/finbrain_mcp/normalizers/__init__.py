@@ -15,6 +15,11 @@ from .reddit_mentions import (
     normalize_screener_reddit_mentions,
     normalize_screener_reddit_mentions_summary,
 )
+from .government_contracts import (
+    normalize_government_contracts_ticker,
+    normalize_screener_government_contracts,
+    normalize_screener_government_contracts_summary,
+)
 from .screener import (
     normalize_screener_sentiment,
     normalize_screener_analyst_ratings,
@@ -51,4 +56,7 @@ __all__ = [
     "normalize_reddit_mentions_ticker",
     "normalize_screener_reddit_mentions",
     "normalize_screener_reddit_mentions_summary",
+    "normalize_government_contracts_ticker",
+    "normalize_screener_government_contracts",
+    "normalize_screener_government_contracts_summary",
 ]

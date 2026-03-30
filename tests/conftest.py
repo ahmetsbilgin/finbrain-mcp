@@ -217,6 +217,37 @@ class _Screener:
             },
         ]
 
+    def government_contracts(self, *, limit=None, as_dataframe=False):
+        return {
+            "data": [
+                {
+                    "symbol": "LMT",
+                    "name": "Lockheed Martin Corporation",
+                    "awardId": "CONT_AWD_0001",
+                    "awardAmount": 50000000,
+                    "recipientName": "Lockheed Martin Corporation",
+                    "startDate": "2025-06-01",
+                    "awardingAgency": "Department of Defense",
+                    "naicsDescription": "Aircraft Manufacturing",
+                },
+                {
+                    "symbol": "BA",
+                    "name": "The Boeing Company",
+                    "awardId": "CONT_AWD_0003",
+                    "awardAmount": 80000000,
+                    "recipientName": "The Boeing Company",
+                    "startDate": "2025-05-20",
+                    "awardingAgency": "Department of Defense",
+                    "naicsDescription": "Aircraft Manufacturing",
+                },
+            ],
+            "summary": {
+                "totalContracts": 2,
+                "totalTickers": 2,
+                "totalValue": 130000000,
+            },
+        }
+
     def reddit_mentions(self, *, limit=None, market=None, region=None, as_dataframe=False):
         return {
             "data": [
@@ -476,6 +507,52 @@ class _CorporateLobbying:
         }
 
 
+class _GovernmentContracts:
+    def ticker(
+        self,
+        symbol: str,
+        date_from=None,
+        date_to=None,
+        as_dataframe: bool = False,
+        **kw,
+    ):
+        # V2: contracts array with government contract awards
+        return {
+            "symbol": symbol,
+            "name": "Lockheed Martin Corporation" if symbol == "LMT" else symbol,
+            "contracts": [
+                {
+                    "awardId": "CONT_AWD_0001",
+                    "awardAmount": 50000000,
+                    "awardType": "",
+                    "awardingAgency": "Department of Defense",
+                    "awardingSubAgency": "Department of the Army",
+                    "recipientName": "Lockheed Martin Corporation",
+                    "startDate": "2025-06-01",
+                    "endDate": "2026-06-01",
+                    "description": "Aircraft maintenance services",
+                    "naicsCode": "336411",
+                    "naicsDescription": "Aircraft Manufacturing",
+                    "contractAwardType": "",
+                },
+                {
+                    "awardId": "CONT_AWD_0002",
+                    "awardAmount": 12000000,
+                    "awardType": "",
+                    "awardingAgency": "NASA",
+                    "awardingSubAgency": "NASA Headquarters",
+                    "recipientName": "Lockheed Martin Corporation",
+                    "startDate": "2025-03-15",
+                    "endDate": "2027-03-15",
+                    "description": "Space systems development",
+                    "naicsCode": "336414",
+                    "naicsDescription": "Guided Missile and Space Vehicle Manufacturing",
+                    "contractAwardType": "",
+                },
+            ],
+        }
+
+
 class _InsiderTransactions:
     def ticker(
         self,
@@ -635,6 +712,7 @@ class FakeFinBrainSDK:
         self.linkedin_data = _LinkedIn()
         self.options = _Options()
         self.reddit_mentions = _RedditMentions()
+        self.government_contracts = _GovernmentContracts()
         self.news = _News()
         self.recent = _Recent()
 
