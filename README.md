@@ -43,6 +43,10 @@ Browse recent news articles for any ticker, or track aggregated daily sentiment 
 
 ----------
 
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/ahmetsbilgin-finbrain-mcp).
+
 ## What you get
 
 - ⚡️ **Local** MCP server (no proxying) using your **own FinBrain API key**
