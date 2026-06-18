@@ -20,6 +20,11 @@ from .government_contracts import (
     normalize_screener_government_contracts,
     normalize_screener_government_contracts_summary,
 )
+from .patent_filings import (
+    normalize_patent_filings_ticker,
+    normalize_screener_patent_filings,
+    normalize_screener_patent_filings_summary,
+)
 from .screener import (
     normalize_screener_sentiment,
     normalize_screener_analyst_ratings,
@@ -59,4 +64,7 @@ __all__ = [
     "normalize_government_contracts_ticker",
     "normalize_screener_government_contracts",
     "normalize_screener_government_contracts_summary",
+    "normalize_patent_filings_ticker",
+    "normalize_screener_patent_filings",
+    "normalize_screener_patent_filings_summary",
 ]

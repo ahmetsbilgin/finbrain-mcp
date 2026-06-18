@@ -1,7 +1,5 @@
 from __future__ import annotations
 from .registry import mcp
-from .auth import resolve_api_key
-from .client_adapter import FBClient
 
 # Import tool modules so their @tool functions register
 from .tools import availability  # noqa: F401
@@ -19,14 +17,9 @@ from .tools import news  # noqa: F401
 from .tools import recent  # noqa: F401
 from .tools import reddit_mentions  # noqa: F401
 from .tools import government_contracts  # noqa: F401
+from .tools import patent_filings  # noqa: F401
 from .tools import screener  # noqa: F401
 from .tools import health  # noqa: F401
-
-
-# Eagerly resolve to fail fast with a good error if misconfigured
-def _make_client() -> FBClient:
-    key = resolve_api_key()
-    return FBClient(key)
 
 
 def main() -> None:

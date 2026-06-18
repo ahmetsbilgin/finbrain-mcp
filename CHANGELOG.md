@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2026-06-18
+
+### Added
+
+- `patent_filings_by_ticker` tool — USPTO granted patents mapped to a single ticker by corporate assignee (patent ID, grant date, title, type, claims, citations, CPC classification, inventors, filing-to-grant time)
+- `screener_patent_filings` tool — cross-ticker patent filings screening with summary stats (total patents, total tickers, top CPC sections)
+- Integration tests for patent filings (ticker, screener, and tool-level round-trip)
+
+### Fixed
+
+- Screener `summary` block is now populated for `screener_government_contracts` (regression since 0.2.3) and `screener_reddit_mentions` (since 0.2.2) — both previously returned all-`null` summary fields because the SDK unwraps screener responses down to the rows and discards the summary. The adapter now fetches the full envelope so the backend-computed summary is preserved.
+
+### Changed
+
+- Bumped `finbrain-python` dependency from `>=0.2.3` to `>=0.2.5` (required for patent filings endpoints)
+- `FBClient` now caches the underlying `finbrain-python` client per API key, so repeated tool calls reuse a single HTTP session/connection pool instead of opening a new one each call
+- Strengthened screener integration tests to assert summary *values* (not just key presence), which is what previously masked the empty-summary bug
+- Internal cleanup: removed the unused `_make_client` helper from the server entrypoint, documented `latest_slice`'s chronological-ordering assumption, and corrected README inaccuracies (a non-existent `settings.py` in the project tree and the API-key configuration note)
+
 ## [0.2.3] - 2026-03-30
 
 ### Added
@@ -145,6 +164,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Linting with ruff
 - Example configurations for Claude Desktop and VS Code
 
+[0.2.4]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.2.3...v0.2.4
+[0.2.3]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.2.2...v0.2.3
+[0.2.2]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.1.6...v0.2.0
 [0.1.6]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.1.5...v0.1.6

@@ -29,6 +29,9 @@ from .normalizers import (
     normalize_government_contracts_ticker,
     normalize_screener_government_contracts,
     normalize_screener_government_contracts_summary,
+    normalize_patent_filings_ticker,
+    normalize_screener_patent_filings,
+    normalize_screener_patent_filings_summary,
 )
 
 # SDK import (PyPI package name is finbrain-python; import path is `finbrain`)
@@ -42,8 +45,46 @@ class FBClient:
     returns a DataFrame for any reason.
     """
 
+    # Cache underlying SDK clients (and their requests.Session) by API key so
+    # repeated tool calls reuse one connection pool instead of opening a fresh
+    # session every time.
+    _sdk_cache: dict[str, FinBrainClient] = {}
+
     def __init__(self, api_key: str):
-        self.fb = FinBrainClient(api_key=api_key)
+        sdk = FBClient._sdk_cache.get(api_key)
+        if sdk is None:
+            sdk = FinBrainClient(api_key=api_key)
+            FBClient._sdk_cache[api_key] = sdk
+        self.fb = sdk
+
+    def _screener_envelope(
+        self,
+        path: str,
+        *,
+        limit: int | None = None,
+        market: str | None = None,
+        region: str | None = None,
+    ) -> tuple[list, dict]:
+        """
+        Fetch a v2 screener endpoint preserving the ``summary`` block.
+
+        The SDK's ``ScreenerAPI`` methods unwrap responses down to the rows list
+        and discard ``summary``, so for endpoints that carry one we hit the
+        underlying request directly to keep both ``data`` and ``summary``.
+        """
+        params: dict[str, str] = {}
+        if limit is not None:
+            params["limit"] = str(limit)
+        if market:
+            params["market"] = market
+        if region:
+            params["region"] = region
+        payload = self.fb._request("GET", path, params=params or None)
+        if isinstance(payload, dict):
+            rows = payload.get("data") or []
+            summary = payload.get("summary") or {}
+            return df_to_records_maybe(rows), summary
+        return df_to_records_maybe(payload) or [], {}
 
     # ---------- availability ----------
     def available_markets(self) -> List[str] | Any:
@@ -296,15 +337,13 @@ class FBClient:
         region: str | None = None,
         limit: int | None = None,
     ) -> Any:
-        raw = self.fb.screener.reddit_mentions(
-            market=market, region=region, limit=limit, as_dataframe=False
+        items, summary = self._screener_envelope(
+            "screener/reddit-mentions", limit=limit, market=market, region=region
         )
-        items = df_to_records_maybe(raw.get("data") if isinstance(raw, dict) else raw)
-        rows = normalize_screener_reddit_mentions(items)
-        summary = normalize_screener_reddit_mentions_summary(
-            raw.get("summary") if isinstance(raw, dict) else {}
-        )
-        return {"rows": rows, "summary": summary}
+        return {
+            "rows": normalize_screener_reddit_mentions(items),
+            "summary": normalize_screener_reddit_mentions_summary(summary),
+        }
 
     # ---------- government contracts ----------
     def government_contracts_ticker(
@@ -318,13 +357,33 @@ class FBClient:
     def screener_government_contracts(
         self, limit: int | None = None
     ) -> Any:
-        raw = self.fb.screener.government_contracts(limit=limit, as_dataframe=False)
-        items = df_to_records_maybe(raw.get("data") if isinstance(raw, dict) else raw)
-        rows = normalize_screener_government_contracts(items)
-        summary = normalize_screener_government_contracts_summary(
-            raw.get("summary") if isinstance(raw, dict) else {}
+        items, summary = self._screener_envelope(
+            "screener/government-contracts", limit=limit
         )
-        return {"rows": rows, "summary": summary}
+        return {
+            "rows": normalize_screener_government_contracts(items),
+            "summary": normalize_screener_government_contracts_summary(summary),
+        }
+
+    # ---------- patent filings ----------
+    def patent_filings_ticker(
+        self, ticker: str, date_from: str | None, date_to: str | None
+    ) -> Any:
+        raw = self.fb.patent_filings.ticker(
+            ticker, date_from=date_from, date_to=date_to, as_dataframe=False
+        )
+        return normalize_patent_filings_ticker(raw)
+
+    def screener_patent_filings(
+        self, limit: int | None = None
+    ) -> Any:
+        items, summary = self._screener_envelope(
+            "screener/patent-filings", limit=limit
+        )
+        return {
+            "rows": normalize_screener_patent_filings(items),
+            "summary": normalize_screener_patent_filings_summary(summary),
+        }
 
     def screener_app_ratings(
         self,

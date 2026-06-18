@@ -167,9 +167,37 @@ class TestGovernmentContracts:
         assert len(rows) > 0
         assert "ticker" in rows[0]
         assert "award_amount" in rows[0]
+        # summary must be populated by the backend, not just present-with-nulls
         summary = result.get("summary", {})
-        assert "total_contracts" in summary
-        assert "total_value" in summary
+        assert summary.get("total_contracts") is not None
+        assert summary["total_contracts"] > 0
+        assert summary.get("total_tickers") is not None
+
+
+# ---------------------------------------------------------------------------
+# patent filings
+# ---------------------------------------------------------------------------
+
+class TestPatentFilings:
+    def test_ticker(self):
+        obj = _client().patent_filings_ticker(TICKER, None, None)
+        _assert_series_shape(obj, {"patent_id", "patent_date", "title", "type",
+                                   "num_claims", "assignee_organization",
+                                   "primary_cpc_section"})
+
+    def test_screener(self):
+        result = _client().screener_patent_filings(limit=5)
+        assert isinstance(result, dict)
+        rows = result.get("rows", [])
+        assert isinstance(rows, list)
+        assert len(rows) > 0
+        assert "ticker" in rows[0]
+        assert "patent_id" in rows[0]
+        # summary must be populated by the backend, not just present-with-nulls
+        summary = result.get("summary", {})
+        assert summary.get("total_patents") is not None
+        assert summary["total_patents"] > 0
+        assert summary.get("total_tickers") is not None
 
 
 # ---------------------------------------------------------------------------
@@ -253,4 +281,15 @@ class TestToolRoundTrip:
         out = government_contracts_by_ticker(GovernmentContractsReq(ticker="LMT", limit=5))
         assert out["format"] == "json"
         assert out["ticker"] == "LMT"
+        assert out["series_count"] <= 5
+
+    def test_patent_filings(self):
+        from finbrain_mcp.tools.patent_filings import (
+            patent_filings_by_ticker,
+            PatentFilingsReq,
+        )
+
+        out = patent_filings_by_ticker(PatentFilingsReq(ticker=TICKER, limit=5))
+        assert out["format"] == "json"
+        assert out["ticker"] == TICKER
         assert out["series_count"] <= 5

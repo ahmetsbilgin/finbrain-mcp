@@ -166,6 +166,24 @@ def screener_government_contracts(req: ScreenerLimitOnlyReq):
     return resp
 
 
+def screener_patent_filings(req: ScreenerLimitOnlyReq):
+    """
+    Screen USPTO granted patents across all tickers.
+    Returns rows with ticker, name, patent_id, patent_date, title, type,
+    assignee_organization, primary_cpc_section, num_claims,
+    plus a summary with aggregate stats (total_patents, total_tickers, top_cpc_sections).
+    """
+    client = FBClient(resolve_api_key())
+    result = client.screener_patent_filings(
+        limit=req.limit
+    ) or {"rows": [], "summary": {}}
+    rows = result.get("rows", [])
+    resp = _screener_response(rows, req.limit, req.format)
+    if resp["format"] == "json":
+        resp["summary"] = result.get("summary", {})
+    return resp
+
+
 def screener_reddit_mentions(req: ScreenerOptionalMarketReq):
     """
     Screen Reddit mentions across tickers.
@@ -194,4 +212,5 @@ mcp.tool()(screener_put_call_ratio)
 mcp.tool()(screener_linkedin)
 mcp.tool()(screener_app_ratings)
 mcp.tool()(screener_government_contracts)
+mcp.tool()(screener_patent_filings)
 mcp.tool()(screener_reddit_mentions)

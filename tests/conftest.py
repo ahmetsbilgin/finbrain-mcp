@@ -248,6 +248,39 @@ class _Screener:
             },
         }
 
+    def patent_filings(self, *, limit=None, as_dataframe=False):
+        return {
+            "data": [
+                {
+                    "symbol": "AAPL",
+                    "name": "Apple Inc.",
+                    "patentId": "12345678",
+                    "patentDate": "2025-06-01",
+                    "title": "On-device machine learning",
+                    "type": "utility",
+                    "assigneeOrganization": "Apple Inc.",
+                    "primaryCpcSection": "G",
+                    "numClaims": 20,
+                },
+                {
+                    "symbol": "MSFT",
+                    "name": "Microsoft Corporation",
+                    "patentId": "12345699",
+                    "patentDate": "2025-05-20",
+                    "title": "Distributed training scheduler",
+                    "type": "utility",
+                    "assigneeOrganization": "Microsoft Technology Licensing, LLC",
+                    "primaryCpcSection": "G",
+                    "numClaims": 18,
+                },
+            ],
+            "summary": {
+                "totalPatents": 2,
+                "totalTickers": 2,
+                "topCpcSections": ["G"],
+            },
+        }
+
     def reddit_mentions(self, *, limit=None, market=None, region=None, as_dataframe=False):
         return {
             "data": [
@@ -553,6 +586,60 @@ class _GovernmentContracts:
         }
 
 
+class _PatentFilings:
+    def ticker(
+        self,
+        symbol: str,
+        date_from=None,
+        date_to=None,
+        as_dataframe: bool = False,
+        **kw,
+    ):
+        # V2: patents array with USPTO granted patent records
+        return {
+            "symbol": symbol,
+            "name": "Apple Inc." if symbol == "AAPL" else symbol,
+            "patents": [
+                {
+                    "patentId": "12345678",
+                    "patentDate": "2025-06-01",
+                    "title": "Method and apparatus for on-device machine learning",
+                    "type": "utility",
+                    "kind": "B2",
+                    "numClaims": 20,
+                    "numCitedBy": 5,
+                    "assigneeOrganization": "Apple Inc.",
+                    "assigneeType": "2",
+                    "applicationFilingDate": "2022-03-15",
+                    "filingToGrantDays": 808,
+                    "inventors": ["Jane Doe", "John Roe"],
+                    "numInventors": 2,
+                    "cpcSections": ["G", "H"],
+                    "cpcSubsections": ["G06", "H04"],
+                    "primaryCpcSection": "G",
+                },
+                {
+                    "patentId": "12345679",
+                    "patentDate": "2025-03-15",
+                    "title": "Display panel with adaptive refresh",
+                    "type": "utility",
+                    "kind": "B2",
+                    "numClaims": 15,
+                    "numCitedBy": 2,
+                    "assigneeOrganization": "Apple Inc.",
+                    "assigneeType": "2",
+                    "applicationFilingDate": "2021-11-01",
+                    "filingToGrantDays": 865,
+                    "inventors": ["Alice Smith"],
+                    "numInventors": 1,
+                    "cpcSections": ["G"],
+                    "cpcSubsections": ["G09"],
+                    "primaryCpcSection": "G",
+                },
+            ],
+        }
+
+
 class _InsiderTransactions:
     def ticker(
         self,
@@ -713,8 +800,23 @@ class FakeFinBrainSDK:
         self.options = _Options()
         self.reddit_mentions = _RedditMentions()
         self.government_contracts = _GovernmentContracts()
+        self.patent_filings = _PatentFilings()
         self.news = _News()
         self.recent = _Recent()
+
+    def _request(self, method, path, params=None):
+        """
+        Mimic the SDK's low-level request for screener endpoints that carry a
+        ``summary`` (the adapter hits this directly to preserve it).
+        """
+        screener_paths = {
+            "screener/government-contracts": self.screener.government_contracts,
+            "screener/reddit-mentions": self.screener.reddit_mentions,
+            "screener/patent-filings": self.screener.patent_filings,
+        }
+        if path in screener_paths:
+            return screener_paths[path]()
+        raise AssertionError(f"unexpected _request path: {path!r}")
 
 
 @pytest.fixture

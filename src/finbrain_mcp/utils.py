@@ -4,12 +4,13 @@ from typing import Any, Iterable, Dict
 
 def latest_slice(rows: list[dict] | list[Any], limit: int) -> list:
     """
-    Return the last `limit` items, preserving original order (chronological).
-    Equivalent to: limit_slice(rows, 0, limit, from_end=True).
+    Return the last `limit` items, preserving original order.
+
+    Assumes `rows` is in ascending chronological order, so the last `limit`
+    items are the most recent ones. Normalizers sort series ascending by date
+    before this is applied; pass already-ascending data to get "most recent N".
     """
     rows = list(rows or [])
-    if limit is None:
-        return rows
     if limit <= 0:
         return []
     if limit >= len(rows):
@@ -39,8 +40,12 @@ def rows_to_csv(rows: Iterable[Dict]) -> str:
     return buf.getvalue()
 
 
-def df_to_records_maybe(obj: Any) -> list[dict]:
-    """If obj is a pandas DataFrame/Series, convert to JSON records; else return as-is."""
+def df_to_records_maybe(obj: Any) -> Any:
+    """
+    If obj is a pandas DataFrame/Series, convert to JSON records; if it is
+    already a list, return it unchanged. Any other shape is returned as-is so
+    callers (which guard with isinstance checks) can decide how to handle it.
+    """
     try:
         import pandas as pd  # type: ignore[import-untyped]
 
@@ -54,4 +59,4 @@ def df_to_records_maybe(obj: Any) -> list[dict]:
             return [obj.to_dict()]
     except Exception:
         pass
-    return obj  # type: ignore[return-value]
+    return obj

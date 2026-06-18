@@ -34,6 +34,7 @@ Browse recent news articles for any ticker, or track aggregated daily sentiment 
 - **Options Flow** — Put/call ratios and volume to gauge market positioning
 - **Reddit Mentions** — Ticker mention counts across subreddits, collected every 4 hours
 - **Government Contracts** — U.S. government contract awards from USAspending.gov
+- **Patent Filings** — USPTO granted patents mapped to tickers by corporate assignee, with CPC classification
 
 ### Institutional & Insider Activity
 
@@ -76,17 +77,19 @@ Browse recent news articles for any ticker, or track aggregated daily sentiment 
 
   - `government_contracts_by_ticker`
 
+  - `patent_filings_by_ticker`
+
   - `recent_news`, `recent_analyst_ratings`
 
   - `screener_sentiment`, `screener_analyst_ratings`, `screener_news`
 
   - `screener_insider_trading`, `screener_house_trades`, `screener_senate_trades`
 
-  - `screener_put_call_ratio`, `screener_linkedin`, `screener_app_ratings`, `screener_reddit_mentions`, `screener_government_contracts`
+  - `screener_put_call_ratio`, `screener_linkedin`, `screener_app_ratings`, `screener_reddit_mentions`, `screener_government_contracts`, `screener_patent_filings`
 
 - 🧹 Consistent, model-friendly shapes (we normalize raw API responses)
 
-- 🔑 Multiple ways to provide your API key: env var, file
+- 🔑 Provide your API key via the `FINBRAIN_API_KEY` environment variable (a shell env var or your MCP client's `env` block)
 
 ----------
 
@@ -332,12 +335,17 @@ You don’t need to know tool names—just ask in plain English. Examples:
   - “Show **government contracts** awarded to **LMT** in **2025**.”
   - “Which companies have the **largest government contract awards**?”
 
+- **Patent filings**
+  - “Show recent **patent filings** for **AAPL**.”
+  - “Which companies have the **most granted patents** lately?”
+
 - **Screeners (cross-ticker)**
   - “Screen **sentiment** across **S&P 500** stocks.”
   - “Show the **latest analyst ratings** across all stocks.”
   - “Screen **insider trades** across all tickers (limit 50).”
   - “Screen **LinkedIn data** for **US** region stocks.”
   - “What are the **most mentioned tickers** on **Reddit** right now?”
+  - “Which companies are filing the **most patents** right now?”
 
 - **Availability**
   - “Which **markets** are available?”
@@ -377,9 +385,8 @@ finbrain-mcp
 │     ├─ __init__.py
 │     ├─ server.py                # MCP server entrypoint
 │     ├─ registry.py              # FastMCP instance
-│     ├─ client_adapter.py        # wraps finbrain-python; calls normalizers
+│     ├─ client_adapter.py        # wraps finbrain-python; caches SDK client; calls normalizers
 │     ├─ auth.py                  # resolves API key (env var)
-│     ├─ settings.py              # tweakable defaults (e.g., series limits)
 │     ├─ utils.py                 # helpers (latest_slice, CSV, DF->records)
 │     ├─ normalizers/             # endpoint-specific shapers
 │     └─ tools/                   # MCP tool functions (registered & testable)
