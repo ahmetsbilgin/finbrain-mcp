@@ -3,12 +3,38 @@ on:
   push:
     tags: ["v*"]   # e.g., v0.2.0
 permissions:
-  id-token: write   # required for OIDC
   contents: read
 
 jobs:
-  build-and-publish:
+  # Gate the upload on the tagged commit actually passing. CI only runs on
+  # pushes to main and on pull requests, so before this job a tag was published
+  # with nothing verifying that commit at all. PyPI versions are immutable, so
+  # a bad upload cannot be replaced, only superseded.
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: pip install -U pip
+      - run: pip install -e .[dev]
+      - run: ruff check .
+      - run: mypy .
+      - run: pytest -q
+
+  build-and-publish:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # required for OIDC; scoped to the job that publishes
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:

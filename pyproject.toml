@@ -28,3 +28,23 @@ where = ["src"]
 exclude = ["tests*"]
 
 [tool.setuptools_scm]
+
+[tool.ruff.lint]
+# Pin the rule set explicitly. `ruff check .` otherwise follows whatever ruff's
+# current defaults happen to be, so a new ruff release can turn CI red with no
+# code change (0.16.0 widened the defaults and surfaced hundreds of findings in
+# code that had been passing). These four are ruff's long-standing defaults, so
+# this preserves existing behaviour rather than changing it.
+select = ["E4", "E7", "E9", "F"]
+
+[tool.mypy]
+ignore_missing_imports = true
+
+# numpy ships inline stubs using PEP 695 `type` statements, which mypy cannot
+# parse unless it is running under Python 3.12+. On the 3.10 and 3.11 matrix
+# jobs a numpy release can therefore abort the whole run with no change to this
+# codebase. Nothing here surfaces numpy types, so skip its stubs.
+[[tool.mypy.overrides]]
+module = ["numpy.*"]
+follow_imports = "skip"
+follow_imports_for_stubs = true

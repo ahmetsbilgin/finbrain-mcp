@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Bumped `finbrain-python` dependency from `>=0.2.5` to `>=0.2.6` — the SDK passes API responses through unchanged, so `disclosureDate` technically arrives on 0.2.5 too, but raising the floor keeps the pairing unambiguous and guarantees users get the SDK release that documents and tests the field
+- **Tooling**: pinned the ruff rule set to `E4`/`E7`/`E9`/`F` in `[tool.ruff.lint]`. `ruff check .` ran with no ruff configuration, so ruff 0.16.0's widened defaults would have failed CI with 205 findings in unchanged code
+- **Tooling**: added a minimal `[tool.mypy]` block (the repo had none, and CI runs a bare `mypy .`) that stops mypy following numpy's stubs. numpy ships PEP 695 `type` statements that mypy cannot parse unless it is running under Python 3.12+, which would have aborted the 3.10 and 3.11 matrix jobs
 - **CSV output gains a trailing `disclosure_date` column** on `house_trades_by_ticker`, `senate_trades_by_ticker`, `screener_house_trades` and `screener_senate_trades` when `format="csv"`. Anything that parses those CSVs positionally, or asserts a fixed column count, needs updating. A missing disclosure date renders as an empty field in CSV (it is `null` only in the JSON form)
 
 ### Notes
