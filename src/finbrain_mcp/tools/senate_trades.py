@@ -9,8 +9,12 @@ from ..utils import latest_slice, rows_to_csv
 
 class SenateTradesReq(BaseModel):
     ticker: str
-    date_from: Optional[str] = Field(None, description="YYYY-MM-DD")
-    date_to: Optional[str] = Field(None, description="YYYY-MM-DD")
+    date_from: Optional[str] = Field(
+        None, description="YYYY-MM-DD; bounds the transaction date, not disclosure_date"
+    )
+    date_to: Optional[str] = Field(
+        None, description="YYYY-MM-DD; bounds the transaction date, not disclosure_date"
+    )
     limit: int = Field(100, ge=1, le=5000)
     format: Literal["json", "csv"] = "json"
 
@@ -22,9 +26,14 @@ def senate_trades_by_ticker(req: SenateTradesReq):
         format: "json",
         ticker, name,
         series: [{date, senator, trade_type,
-                  amount_min, amount_max, amount_exact, amount_raw}, ...],
+                  amount_min, amount_max, amount_exact, amount_raw,
+                  disclosure_date}, ...],
         series_count, series_total
       }
+    `date` is the transaction date; `disclosure_date` is when the trade was
+    publicly disclosed in the member's periodic transaction report. The gap
+    between them is the reporting lag. `disclosure_date` is null on rows
+    collected before the field was captured upstream.
     CSV returns the sliced `series`.
     """
     client = FBClient(resolve_api_key())

@@ -81,7 +81,8 @@ def screener_insider_trading(req: ScreenerLimitOnlyReq):
 def screener_house_trades(req: ScreenerLimitOnlyReq):
     """
     Screen House of Representatives trades across all tickers.
-    Returns rows with ticker, name, date, politician, trade_type, amount.
+    Returns rows with ticker, name, date, politician, trade_type, amount,
+    disclosure_date (public disclosure date; null on historical rows).
     """
     client = FBClient(resolve_api_key())
     rows = client.screener_congress_house(limit=req.limit) or []
@@ -91,7 +92,8 @@ def screener_house_trades(req: ScreenerLimitOnlyReq):
 def screener_senate_trades(req: ScreenerLimitOnlyReq):
     """
     Screen Senate trades across all tickers.
-    Returns rows with ticker, name, date, politician, trade_type, amount.
+    Returns rows with ticker, name, date, politician, trade_type, amount,
+    disclosure_date (public disclosure date; null on historical rows).
     """
     client = FBClient(resolve_api_key())
     rows = client.screener_congress_senate(limit=req.limit) or []

@@ -17,6 +17,8 @@ def test_senate_trades_normalized_json(patch_resolvers):
     assert rows[0]["amount_max"] == 15000.0
     assert rows[0]["amount_exact"] is False
     assert rows[0]["amount_raw"].startswith("$1,001")
+    # Historical row — upstream had no disclosure date for it.
+    assert rows[0]["disclosure_date"] is None
 
     assert rows[1]["date"] == "2025-11-13"
     assert rows[1]["senator"] == "Shelley Moore Capito"
@@ -24,6 +26,7 @@ def test_senate_trades_normalized_json(patch_resolvers):
     assert rows[1]["amount_min"] == 1001.0
     assert rows[1]["amount_max"] == 15000.0
     assert rows[1]["amount_exact"] is False
+    assert rows[1]["disclosure_date"] == "2025-12-04"
 
 
 def test_senate_trades_csv(patch_resolvers):
@@ -40,5 +43,6 @@ def test_senate_trades_csv(patch_resolvers):
         "amount_max",
         "amount_exact",
         "amount_raw",
+        "disclosure_date",
     ]:
         assert col in header

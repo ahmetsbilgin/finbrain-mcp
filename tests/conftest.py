@@ -155,6 +155,7 @@ class _Screener:
                 "politician": "Nancy Pelosi",
                 "transactionType": "Purchase",
                 "amount": "$1,000,001 - $5,000,000",
+                "disclosureDate": "2026-01-28",
             },
         ]
 
@@ -167,6 +168,7 @@ class _Screener:
                 "politician": "Tommy Tuberville",
                 "transactionType": "Purchase",
                 "amount": "$50,001 - $100,000",
+                "disclosureDate": None,
             },
         ]
 
@@ -456,12 +458,16 @@ class _HouseTrades:
                     "amount": "$360.00",
                     "politician": "Pete Sessions",
                     "transactionType": "Purchase",
+                    "disclosureDate": "2024-03-14",
                 },
                 {
+                    # Historical row: collected before the pipeline captured
+                    # disclosure dates, so the backend returns null.
                     "date": "2024-01-25",
                     "amount": "$15,001 - $50,000",
                     "politician": "Shri Thanedar",
                     "transactionType": "Sale",
+                    "disclosureDate": None,
                 },
             ],
         }
@@ -487,12 +493,16 @@ class _SenateTrades:
                     "amount": "$1,001 - $15,000",
                     "politician": "Shelley Moore Capito",
                     "transactionType": "Purchase",
+                    "disclosureDate": "2025-12-04",
                 },
                 {
+                    # Historical row: collected before the pipeline captured
+                    # disclosure dates, so the backend returns null.
                     "date": "2025-10-31",
                     "amount": "$1,001 - $15,000",
                     "politician": "John Boozman",
                     "transactionType": "Purchase",
+                    "disclosureDate": None,
                 },
             ],
         }

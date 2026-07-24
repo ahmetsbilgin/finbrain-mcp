@@ -46,6 +46,7 @@ def test_screener_house_trades(patch_resolvers):
     assert row["ticker"] == "NVDA"
     assert row["politician"] == "Nancy Pelosi"
     assert row["trade_type"] == "Purchase"
+    assert row["disclosure_date"] == "2026-01-28"
 
 
 def test_screener_senate_trades(patch_resolvers):
@@ -56,6 +57,8 @@ def test_screener_senate_trades(patch_resolvers):
     row = out["rows"][0]
     assert row["ticker"] == "MSFT"
     assert row["politician"] == "Tommy Tuberville"
+    # Historical row — upstream had no disclosure date for it.
+    assert row["disclosure_date"] is None
 
 
 def test_screener_news(patch_resolvers):

@@ -17,6 +17,8 @@ def test_house_trades_normalized_json(patch_resolvers):
     assert rows[0]["amount_max"] == 50000.0
     assert rows[0]["amount_exact"] is False
     assert rows[0]["amount_raw"].startswith("$15,001")
+    # Historical row — upstream had no disclosure date for it.
+    assert rows[0]["disclosure_date"] is None
 
     assert rows[1]["date"] == "2024-02-29"
     assert rows[1]["representative"] == "Pete Sessions"
@@ -24,6 +26,7 @@ def test_house_trades_normalized_json(patch_resolvers):
     assert rows[1]["amount_min"] == 360.0
     assert rows[1]["amount_max"] == 360.0
     assert rows[1]["amount_exact"] is True
+    assert rows[1]["disclosure_date"] == "2024-03-14"
 
 
 def test_house_trades_csv(patch_resolvers):
@@ -40,5 +43,6 @@ def test_house_trades_csv(patch_resolvers):
         "amount_max",
         "amount_exact",
         "amount_raw",
+        "disclosure_date",
     ]:
         assert col in header

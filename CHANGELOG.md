@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2026-07-24
+
+### Added
+
+- **Congressional disclosure date**: `house_trades_by_ticker` and `senate_trades_by_ticker` now emit `disclosure_date` on every `series` row — the date the trade was publicly disclosed in the member's periodic transaction report, mapped from the API's `disclosureDate`. `date` remains the transaction date; the gap between the two is the reporting lag
+- `screener_house_trades` and `screener_senate_trades` rows now carry `disclosure_date` as well
+- Tool docstrings and the README describe both dates, so an agent can answer reporting-lag questions without guessing at the field meaning
+- Test fixtures cover both the populated and the null case; the CSV format tests assert the new column is present in the header
+
+### Changed
+
+- Bumped `finbrain-python` dependency from `>=0.2.5` to `>=0.2.6` — the SDK passes API responses through unchanged, so `disclosureDate` technically arrives on 0.2.5 too, but raising the floor keeps the pairing unambiguous and guarantees users get the SDK release that documents and tests the field
+- **CSV output gains a trailing `disclosure_date` column** on `house_trades_by_ticker`, `senate_trades_by_ticker`, `screener_house_trades` and `screener_senate_trades` when `format="csv"`. Anything that parses those CSVs positionally, or asserts a fixed column count, needs updating. A missing disclosure date renders as an empty field in CSV (it is `null` only in the JSON form)
+
+### Notes
+
+- `disclosure_date` is `null` for rows collected before the upstream pipeline captured the field, so consumers should treat it as optional
+- No existing `series` keys were renamed or removed — the JSON shape is additive
+- `date_from` / `date_to` bound the transaction date, not the disclosure date
+
 ## [0.2.4] - 2026-06-18
 
 ### Added
@@ -164,6 +184,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Linting with ruff
 - Example configurations for Claude Desktop and VS Code
 
+[0.2.5]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.2.1...v0.2.2

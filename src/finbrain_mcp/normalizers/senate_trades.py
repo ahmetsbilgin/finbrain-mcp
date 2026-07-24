@@ -36,7 +36,8 @@ def normalize_senate_trades_ticker(obj: Any) -> Dict:
       "chamber": "senate",
       "trades": [
         {"date": "2025-11-13", "politician": "Shelley Moore Capito",
-         "transactionType": "Purchase", "amount": "$1,001 - $15,000"},
+         "transactionType": "Purchase", "amount": "$1,001 - $15,000",
+         "disclosureDate": "2025-12-04"},
         ...
       ]
     }
@@ -48,10 +49,16 @@ def normalize_senate_trades_ticker(obj: Any) -> Dict:
         {"date": "2025-11-13", "senator": "Shelley Moore Capito",
          "trade_type": "Purchase",
          "amount_min": 1001.0, "amount_max": 15000.0,
-         "amount_exact": False, "amount_raw": "$1,001 - $15,000"},
+         "amount_exact": False, "amount_raw": "$1,001 - $15,000",
+         "disclosure_date": "2025-12-04"},
         ...
       ]
     }
+
+    ``disclosure_date`` is the date the trade was publicly disclosed in the
+    member's periodic transaction report; ``date`` is when the trade was
+    executed. The gap between them is the reporting lag. It is ``None`` on
+    rows collected before the upstream pipeline captured the field.
     """
     obj = obj or {}
     rows = obj.get("trades") or []
@@ -69,6 +76,7 @@ def normalize_senate_trades_ticker(obj: Any) -> Dict:
                 "amount_max": mx,
                 "amount_exact": exact,
                 "amount_raw": it.get("amount"),
+                "disclosure_date": it.get("disclosureDate"),
             }
         )
     series.sort(key=lambda r: r["date"])

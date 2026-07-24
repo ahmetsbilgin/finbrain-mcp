@@ -38,7 +38,7 @@ Browse recent news articles for any ticker, or track aggregated daily sentiment 
 
 ### Institutional & Insider Activity
 
-- **US Congress Trades** — Stock transactions disclosed by House representatives and Senators
+- **US Congress Trades** — Stock transactions disclosed by House representatives and Senators, with both the transaction date and the public disclosure date so you can measure reporting lag
 - **Corporate Lobbying** — Lobbying filings with registrant, income, expenses, and issue codes
 - **Insider Transactions** — SEC Form 4 filings showing executive buys and sells
 - **Analyst Ratings** — Wall Street coverage and price target changes
@@ -313,6 +313,7 @@ You don’t need to know tool names—just ask in plain English. Examples:
 - **Congressional trades**
   - “Show **recent House trades** involving **AMZN**.”
   - “Show **recent Senate trades** involving **META**.”
+  - “For **NVDA** House trades, how long did each member take to **disclose** the trade?”
 
 - **Corporate lobbying**
   - “Show **corporate lobbying filings** for **AAPL**.”

@@ -39,6 +39,27 @@ def _assert_series_shape(obj: dict, min_keys: set[str]):
         assert min_keys <= set(obj["series"][0].keys())
 
 
+def _assert_backend_emits_disclosure_date(chamber: str):
+    """
+    The MCP normalizers emit ``disclosure_date`` unconditionally via
+    ``.get("disclosureDate")``, so asserting the key exists on a normalized row
+    proves nothing about the API. Check the raw SDK payload instead, so a
+    backend regression that stops sending ``disclosureDate`` actually fails
+    here rather than silently degrading every row to null.
+    """
+    from finbrain import FinBrainClient
+    from finbrain_mcp.auth import resolve_api_key
+
+    fb = FinBrainClient(api_key=resolve_api_key())
+    api = getattr(fb, f"{chamber}_trades")
+    trades = (api.ticker(TICKER) or {}).get("trades") or []
+    if not trades:
+        pytest.skip(f"no {chamber} trades for {TICKER}")
+    assert "disclosureDate" in trades[0], (
+        f"backend stopped emitting disclosureDate on /congress/{chamber}"
+    )
+
+
 # ---------------------------------------------------------------------------
 # availability
 # ---------------------------------------------------------------------------
@@ -124,7 +145,13 @@ class TestAppRatings:
 class TestHouseTrades:
     def test_ticker(self):
         obj = _client().house_trades_ticker(TICKER, None, None)
-        _assert_series_shape(obj, {"date", "representative", "trade_type", "amount_raw"})
+        _assert_series_shape(
+            obj,
+            {"date", "representative", "trade_type", "amount_raw", "disclosure_date"},
+        )
+
+    def test_backend_still_sends_disclosure_date(self):
+        _assert_backend_emits_disclosure_date("house")
 
 
 # ---------------------------------------------------------------------------
@@ -134,7 +161,13 @@ class TestHouseTrades:
 class TestSenateTrades:
     def test_ticker(self):
         obj = _client().senate_trades_ticker(TICKER, None, None)
-        _assert_series_shape(obj, {"date", "senator", "trade_type", "amount_raw"})
+        _assert_series_shape(
+            obj,
+            {"date", "senator", "trade_type", "amount_raw", "disclosure_date"},
+        )
+
+    def test_backend_still_sends_disclosure_date(self):
+        _assert_backend_emits_disclosure_date("senate")
 
 
 # ---------------------------------------------------------------------------

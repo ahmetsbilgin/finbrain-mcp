@@ -82,8 +82,11 @@ def normalize_screener_insider_trading(items: Any) -> List[Dict]:
 def normalize_screener_congress(items: Any) -> List[Dict]:
     """
     V2 screener congress (house/senate) rows.
-    [{symbol, name, date, politician, transactionType, amount}]
-    -> [{ticker, name, date, politician, trade_type, amount}]
+    [{symbol, name, date, politician, transactionType, amount, disclosureDate}]
+    -> [{ticker, name, date, politician, trade_type, amount, disclosure_date}]
+
+    ``disclosure_date`` is when the trade was publicly disclosed; ``date`` is
+    when it was executed. ``None`` on rows predating the upstream field.
     """
     out: list[dict] = []
     for it in _rows(items):
@@ -97,6 +100,7 @@ def normalize_screener_congress(items: Any) -> List[Dict]:
                 "politician": it.get("politician"),
                 "trade_type": it.get("transactionType"),
                 "amount": it.get("amount"),
+                "disclosure_date": it.get("disclosureDate"),
             }
         )
     return out
