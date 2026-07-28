@@ -155,6 +155,7 @@ class _Screener:
                 "politician": "Nancy Pelosi",
                 "transactionType": "Purchase",
                 "amount": "$1,000,001 - $5,000,000",
+                "owner": "JT",
                 "disclosureDate": "2026-01-28",
             },
         ]
@@ -168,6 +169,8 @@ class _Screener:
                 "politician": "Tommy Tuberville",
                 "transactionType": "Purchase",
                 "amount": "$50,001 - $100,000",
+                # Historical row a reconcile could not fill.
+                "owner": None,
                 "disclosureDate": None,
             },
         ]
@@ -454,19 +457,28 @@ class _HouseTrades:
             "chamber": "house",
             "trades": [
                 {
+                    # Exact dollar amount: not a STOCK Act bracket, so the
+                    # backend keeps the filed string and flags it.
                     "date": "2024-02-29",
                     "amount": "$360.00",
                     "politician": "Pete Sessions",
                     "transactionType": "Purchase",
+                    "owner": "SELF",
+                    "amountRaw": None,
+                    "amountFlag": "review",
                     "disclosureDate": "2024-03-14",
                 },
                 {
-                    # Historical row: collected before the pipeline captured
-                    # disclosure dates, so the backend returns null.
+                    # Historical row a reconcile could not fill: owner and
+                    # disclosureDate are null. The amount was normalized to
+                    # a bracket, so amountRaw keeps the filed variant.
                     "date": "2024-01-25",
                     "amount": "$15,001 - $50,000",
                     "politician": "Shri Thanedar",
                     "transactionType": "Sale",
+                    "owner": None,
+                    "amountRaw": "$15,001 - $50,000 *",
+                    "amountFlag": None,
                     "disclosureDate": None,
                 },
             ],
@@ -493,15 +505,22 @@ class _SenateTrades:
                     "amount": "$1,001 - $15,000",
                     "politician": "Shelley Moore Capito",
                     "transactionType": "Purchase",
+                    "owner": "SP",
+                    "amountRaw": None,
+                    "amountFlag": None,
                     "disclosureDate": "2025-12-04",
                 },
                 {
-                    # Historical row: collected before the pipeline captured
-                    # disclosure dates, so the backend returns null.
+                    # Blank owner column on the Senate filing reports as
+                    # UNKNOWN; disclosureDate is a historical null a
+                    # reconcile could not fill.
                     "date": "2025-10-31",
                     "amount": "$1,001 - $15,000",
                     "politician": "John Boozman",
                     "transactionType": "Purchase",
+                    "owner": "UNKNOWN",
+                    "amountRaw": None,
+                    "amountFlag": None,
                     "disclosureDate": None,
                 },
             ],

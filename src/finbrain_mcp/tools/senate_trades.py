@@ -27,13 +27,22 @@ def senate_trades_by_ticker(req: SenateTradesReq):
         ticker, name,
         series: [{date, senator, trade_type,
                   amount_min, amount_max, amount_exact, amount_raw,
-                  disclosure_date}, ...],
+                  disclosure_date, owner, amount_as_filed, amount_flag}, ...],
         series_count, series_total
       }
     `date` is the transaction date; `disclosure_date` is when the trade was
     publicly disclosed in the member's periodic transaction report. The gap
-    between them is the reporting lag. `disclosure_date` is null on rows
-    collected before the field was captured upstream.
+    between them is the reporting lag.
+    `owner` is the beneficial owner of the traded account: "SELF", "SP"
+    (spouse), "DC" (dependent child), "JT" (joint), an account code, or
+    "UNKNOWN" for blank Senate filings. `owner` and `disclosure_date` are
+    nullable, though rare — historical rows were backfilled upstream.
+    `amount_raw` is the amount string as served by the API, normalized to a
+    statutory STOCK Act bracket when the filed string is an unambiguous
+    variant of one; `amount_as_filed` then preserves the original filing.
+    `amount_flag` is "review" or "ambiguous" when the filed amount could not
+    be safely normalized (amount_raw keeps the filed string, or "Unknown");
+    both are null on all other rows.
     CSV returns the sliced `series`.
     """
     client = FBClient(resolve_api_key())

@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.6] - 2026-07-28
+
+### Added
+
+- **Congressional account owner**: `house_trades_by_ticker` and `senate_trades_by_ticker` now emit `owner` on every `series` row — the beneficial owner of the traded account: `SELF`, `SP` (spouse), `DC` (dependent child), `JT` (joint), or an account code, mapped from the API's `owner`. Senate filings that leave the owner column blank report `UNKNOWN`; House filings that leave it blank report `SELF`, per the House PTR-form instructions. `screener_house_trades` and `screener_senate_trades` rows carry `owner` as well
+- **Congressional amount normalization metadata**: the ticker-level `series` rows also emit `amount_as_filed` (from the API's `amountRaw`) and `amount_flag` (from `amountFlag`). The API now normalizes `amount` to the ten statutory STOCK Act brackets whenever the filed string is an unambiguous formatting variant of one, so `amount_raw` — which has always carried the API's `amount` string verbatim — serves the normalized bracket on those rows and `amount_as_filed` preserves the string as originally filed. When the filed amount could not be safely normalized, `amount_raw` keeps the filed string (or `Unknown` when the filing had no usable amount) and `amount_flag` is `review` or `ambiguous`; on all other rows both new fields are `null`
+- Tool docstrings and the README describe the owner codes and the amount normalization, so an agent can answer "which trades went through a spouse account" without guessing at field meanings
+- Test fixtures cover the populated, null, `UNKNOWN` and flagged cases; the CSV format tests assert the new columns reach the header; the integration guard that checked the raw SDK payload for `disclosureDate` now checks `owner`, `amountRaw` and `amountFlag` too
+
+### Changed
+
+- Bumped `finbrain-python` dependency from `>=0.2.6` to `>=0.2.8` — the SDK passes API responses through unchanged, so the fields arrive on older versions too, but raising the floor keeps the pairing unambiguous and guarantees users get the SDK release that documents and tests them
+- **CSV output gains trailing `owner`, `amount_as_filed` and `amount_flag` columns** on `house_trades_by_ticker` and `senate_trades_by_ticker`, and a trailing `owner` column on `screener_house_trades` and `screener_senate_trades`, when `format="csv"`. Anything that parses those CSVs positionally, or asserts a fixed column count, needs updating. Missing values render as empty fields in CSV (they are `null` only in the JSON form)
+
+### Notes
+
+- The API's new `amountRaw` field could not map to `amount_raw` — that name has carried the served `amount` string since the tool was introduced — hence `amount_as_filed`. No existing `series` keys were renamed or removed; the JSON shape is additive
+- `owner` and `disclosure_date` are nullable, but nulls are rare in practice: the upstream pipeline backfilled both fields onto historical rows in place. Treat any row a reconcile could not fill as optional
+
 ## [0.2.5] - 2026-07-24
 
 ### Added
@@ -186,6 +205,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Linting with ruff
 - Example configurations for Claude Desktop and VS Code
 
+[0.2.6]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/ahmetsbilgin/finbrain-mcp/compare/v0.2.2...v0.2.3

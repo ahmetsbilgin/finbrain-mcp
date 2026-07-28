@@ -82,7 +82,10 @@ def screener_house_trades(req: ScreenerLimitOnlyReq):
     """
     Screen House of Representatives trades across all tickers.
     Returns rows with ticker, name, date, politician, trade_type, amount,
-    disclosure_date (public disclosure date; null on historical rows).
+    disclosure_date (public disclosure date) and owner (beneficial owner of
+    the account: "SELF", "SP", "DC", "JT", or an account code). owner and
+    disclosure_date are nullable, though rare — historical rows were
+    backfilled upstream.
     """
     client = FBClient(resolve_api_key())
     rows = client.screener_congress_house(limit=req.limit) or []
@@ -93,7 +96,10 @@ def screener_senate_trades(req: ScreenerLimitOnlyReq):
     """
     Screen Senate trades across all tickers.
     Returns rows with ticker, name, date, politician, trade_type, amount,
-    disclosure_date (public disclosure date; null on historical rows).
+    disclosure_date (public disclosure date) and owner (beneficial owner of
+    the account: "SELF", "SP", "DC", "JT", an account code, or "UNKNOWN"
+    for blank Senate filings). owner and disclosure_date are nullable,
+    though rare — historical rows were backfilled upstream.
     """
     client = FBClient(resolve_api_key())
     rows = client.screener_congress_senate(limit=req.limit) or []

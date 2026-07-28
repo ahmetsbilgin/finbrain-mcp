@@ -39,13 +39,14 @@ def _assert_series_shape(obj: dict, min_keys: set[str]):
         assert min_keys <= set(obj["series"][0].keys())
 
 
-def _assert_backend_emits_disclosure_date(chamber: str):
+def _assert_backend_emits_congress_fields(chamber: str):
     """
-    The MCP normalizers emit ``disclosure_date`` unconditionally via
-    ``.get("disclosureDate")``, so asserting the key exists on a normalized row
-    proves nothing about the API. Check the raw SDK payload instead, so a
-    backend regression that stops sending ``disclosureDate`` actually fails
-    here rather than silently degrading every row to null.
+    The MCP normalizers emit ``disclosure_date``, ``owner``,
+    ``amount_as_filed`` and ``amount_flag`` unconditionally via ``.get()``,
+    so asserting the keys exist on a normalized row proves nothing about the
+    API. Check the raw SDK payload instead, so a backend regression that
+    stops sending any of them actually fails here rather than silently
+    degrading every row to null.
     """
     from finbrain import FinBrainClient
     from finbrain_mcp.auth import resolve_api_key
@@ -55,9 +56,10 @@ def _assert_backend_emits_disclosure_date(chamber: str):
     trades = (api.ticker(TICKER) or {}).get("trades") or []
     if not trades:
         pytest.skip(f"no {chamber} trades for {TICKER}")
-    assert "disclosureDate" in trades[0], (
-        f"backend stopped emitting disclosureDate on /congress/{chamber}"
-    )
+    for key in ("disclosureDate", "owner", "amountRaw", "amountFlag"):
+        assert key in trades[0], (
+            f"backend stopped emitting {key} on /congress/{chamber}"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -147,11 +149,12 @@ class TestHouseTrades:
         obj = _client().house_trades_ticker(TICKER, None, None)
         _assert_series_shape(
             obj,
-            {"date", "representative", "trade_type", "amount_raw", "disclosure_date"},
+            {"date", "representative", "trade_type", "amount_raw",
+             "disclosure_date", "owner", "amount_as_filed", "amount_flag"},
         )
 
-    def test_backend_still_sends_disclosure_date(self):
-        _assert_backend_emits_disclosure_date("house")
+    def test_backend_still_sends_congress_fields(self):
+        _assert_backend_emits_congress_fields("house")
 
 
 # ---------------------------------------------------------------------------
@@ -163,11 +166,12 @@ class TestSenateTrades:
         obj = _client().senate_trades_ticker(TICKER, None, None)
         _assert_series_shape(
             obj,
-            {"date", "senator", "trade_type", "amount_raw", "disclosure_date"},
+            {"date", "senator", "trade_type", "amount_raw",
+             "disclosure_date", "owner", "amount_as_filed", "amount_flag"},
         )
 
-    def test_backend_still_sends_disclosure_date(self):
-        _assert_backend_emits_disclosure_date("senate")
+    def test_backend_still_sends_congress_fields(self):
+        _assert_backend_emits_congress_fields("senate")
 
 
 # ---------------------------------------------------------------------------
