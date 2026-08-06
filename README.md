@@ -3,6 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/finbrain-mcp.svg)](https://pypi.org/project/finbrain-mcp/)
 [![CI](https://github.com/ahmetsbilgin/finbrain-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/ahmetsbilgin/finbrain-mcp/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE)
+[![MCPAmpel](https://img.shields.io/endpoint?url=https://mcpampel.com/badge/ahmetsbilgin/finbrain-mcp.json)](https://mcpampel.com/repo/ahmetsbilgin/finbrain-mcp)
 
 > **Requires Python 3.10+**
 
